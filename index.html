@@ -14,7 +14,7 @@
             padding: 50px 20px;
         }
 
-        /* --- Title (White with Grey Glow) --- */
+        /* Title: white w/ grey glow */
         h1 {
             text-align: center;
             color: #ffffff;
@@ -23,70 +23,56 @@
             letter-spacing: 1px;
         }
 
-
-        /* --- Neon Red Buttons --- */
-        #small-buttons {
-            max-width: 600px;
-            margin: 0 auto 30px auto;
-            display: flex;
-            justify-content: center;
-            gap: 14px;
+        /* Container ensures ALL buttons align */
+        .button-container {
+            width: 100%;
+            max-width: 500px;     /* <<< controls final width of all buttons */
+            margin: 0 auto;
         }
 
-        #small-buttons a {
-            width: 40%; /* NARROWER */
-            text-align: center;
-            text-decoration: none;
-            padding: 10px 0;
+        /* ROW for the two red buttons */
+        .row {
+            display: flex;
+            gap: 12px; /* spacing between the red buttons */
+            margin-bottom: 24px;
+        }
+
+        /* Shared Button Base Style */
+        .btn {
+            padding: 12px 0;
             background: #111624;
-            border: 2px solid #ff003355;
             border-radius: 8px;
-            color: #ff3355;
-            font-size: 0.95rem;
             letter-spacing: 0.5px;
-            box-shadow: 0 0 12px #ff003322;
+            text-decoration: none;
+            display: block;
+            text-align: center;
             transition: 0.2s ease;
         }
 
-        #small-buttons a:hover {
+        /* Neon Red Buttons */
+        .btn-red {
+            flex: 1; /* makes both red buttons equal width */
+            border: 2px solid #ff003355;
+            color: #ff3355;
+            box-shadow: 0 0 12px #ff003322;
+        }
+        .btn-red:hover {
             border-color: #ff0033;
             color: #ff0033;
             box-shadow: 0 0 22px #ff0033;
             transform: translateX(6px);
         }
 
-
-        /* --- Blue Link List --- */
-        #links {
-            max-width: 600px;
-            margin: 0 auto;
-            list-style: none;
-            padding: 0;
-        }
-
-        #links li {
-            margin: 16px 0;
-        }
-
-        #links a {
-            text-decoration: none;
-            padding: 14px 16px;  /* narrower */
-            background: #111624;
+        /* Blue Buttons (full width but aligned perfectly under reds) */
+        .btn-blue {
+            width: 100%;
+            margin-bottom: 12px; /* spacing between blue buttons */
             border: 1px solid #0ff3;
-            border-radius: 8px;
-            display: block;
             color: #0ff;
             font-size: 1rem;
-            letter-spacing: 0.5px;
             box-shadow: 0 0 12px #0ff2;
-
-            /* Text centered as requested */
-            text-align: center;
-
-            transition: 0.2s ease;
         }
-
-        #links a:hover {
+        .btn-blue:hover {
             border-color: #0ff;
             box-shadow: 0 0 20px #0ff;
             transform: translateX(6px);
@@ -98,14 +84,19 @@
 
 <h1>Kervian Network</h1>
 
-<!-- Neon Red Buttons -->
-<div id="small-buttons">
-    <a href="aboutme.html">About Me</a>
-    <a href="portfolio.html">Portfolio</a>
+<div class="button-container">
+
+    <!-- Two red buttons on one aligned row -->
+    <div class="row">
+        <a href="aboutme.html" class="btn btn-red">About Me</a>
+        <a href="portfolio.html" class="btn btn-red">Portfolio</a>
+    </div>
+
+    <!-- Blue buttons will be inserted below automatically -->
+    <div id="blue-buttons"></div>
+
 </div>
 
-<!-- Blue Link List -->
-<ul id="links"></ul>
 
 <script>
     const linkList = [
@@ -114,12 +105,15 @@
         { name: "Save the Past", url: "https://savethepast.kervian.com" }
     ];
 
-    const ul = document.getElementById("links");
+    const container = document.getElementById("blue-buttons");
 
     linkList.forEach(link => {
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="${link.url}" target="_blank">${link.name}</a>`;
-        ul.appendChild(li);
+        const btn = document.createElement("a");
+        btn.className = "btn btn-blue";
+        btn.href = link.url;
+        btn.target = "_blank";
+        btn.textContent = link.name;
+        container.appendChild(btn);
     });
 </script>
 
