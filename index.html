@@ -13,6 +13,7 @@
             margin: 0;
             padding: 50px 20px;
         }
+
         h1 {
             text-align: center;
             color: #0ff;
@@ -20,15 +21,52 @@
             margin-bottom: 40px;
             letter-spacing: 1px;
         }
+
+        /* --- Neon Red Buttons --- */
+        #small-buttons {
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        #small-buttons a {
+            width: 50%; /* HALF the width of blue ones */
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 0;
+            background: #111624;
+            border: 2px solid #ff003355; /* neon red base-outline */
+            border-radius: 8px;
+            color: #ff3355;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+
+            /* neon glow */
+            box-shadow: 0 0 12px #ff003322;
+            transition: 0.2s ease;
+        }
+
+        #small-buttons a:hover {
+            border-color: #ff0033;
+            color: #ff0033;
+            box-shadow: 0 0 22px #ff0033;
+            transform: translateX(6px);
+        }
+
+        /* --- Blue Link List --- */
         #links {
             max-width: 600px;
             margin: 0 auto;
             list-style: none;
             padding: 0;
         }
+
         #links li {
             margin: 16px 0;
         }
+
         #links a {
             text-decoration: none;
             padding: 16px 20px;
@@ -42,6 +80,7 @@
             box-shadow: 0 0 12px #0ff2;
             transition: 0.2s ease;
         }
+
         #links a:hover {
             border-color: #0ff;
             box-shadow: 0 0 20px #0ff;
@@ -54,10 +93,16 @@
 
 <h1>Kervian Network</h1>
 
+<!-- Neon Red Buttons -->
+<div id="small-buttons">
+    <a href="aboutme.html">About Me</a>
+    <a href="portfolio.html">Portfolio</a>
+</div>
+
+<!-- Blue Link List -->
 <ul id="links"></ul>
 
 <script>
-    // Add more links here as needed
     const linkList = [
         { name: "My Bio", url: "https://me.kervian.com" },
         { name: "Games I've Made", url: "https://games.kervian.com" },
