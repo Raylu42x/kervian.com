@@ -14,13 +14,15 @@
             padding: 50px 20px;
         }
 
+        /* --- Title (White with Grey Glow) --- */
         h1 {
             text-align: center;
-            color: #0ff;
-            text-shadow: 0 0 10px #0ff;
+            color: #ffffff;
+            text-shadow: 0 0 10px #999;
             margin-bottom: 40px;
             letter-spacing: 1px;
         }
+
 
         /* --- Neon Red Buttons --- */
         #small-buttons {
@@ -32,18 +34,16 @@
         }
 
         #small-buttons a {
-            width: 50%; /* HALF the width of blue ones */
+            width: 40%; /* NARROWER */
             text-align: center;
             text-decoration: none;
             padding: 10px 0;
             background: #111624;
-            border: 2px solid #ff003355; /* neon red base-outline */
+            border: 2px solid #ff003355;
             border-radius: 8px;
             color: #ff3355;
-            font-size: 1rem;
+            font-size: 0.95rem;
             letter-spacing: 0.5px;
-
-            /* neon glow */
             box-shadow: 0 0 12px #ff003322;
             transition: 0.2s ease;
         }
@@ -54,6 +54,7 @@
             box-shadow: 0 0 22px #ff0033;
             transform: translateX(6px);
         }
+
 
         /* --- Blue Link List --- */
         #links {
@@ -69,15 +70,19 @@
 
         #links a {
             text-decoration: none;
-            padding: 16px 20px;
+            padding: 14px 16px;  /* narrower */
             background: #111624;
             border: 1px solid #0ff3;
             border-radius: 8px;
             display: block;
             color: #0ff;
-            font-size: 1.1rem;
+            font-size: 1rem;
             letter-spacing: 0.5px;
             box-shadow: 0 0 12px #0ff2;
+
+            /* Text centered as requested */
+            text-align: center;
+
             transition: 0.2s ease;
         }
 
