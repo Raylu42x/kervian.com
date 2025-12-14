@@ -1,76 +1,187 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>In Progress</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #0b0f19;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 50px 20px;
-            text-align: center;
-        }
+<title>Portfolio — Kervian</title>
 
-        /* Title: white with soft grey glow */
-        h1 {
-            color: #ffffff;
-            text-shadow: 0 0 10px #999;
-            margin-bottom: 35px;
-            letter-spacing: 1px;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #0b0f19;
+        color: #e0e0e0;
+        padding: 60px 20px;
+        text-align: center;
+    }
 
-        /* Yellow Neon Highlight */
-        .neon-yellow {
-            color: #ffd84a;
-            text-shadow: 0 0 8px #ffd84a, 0 0 16px #ffaa00;
-        }
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
 
-        /* Box container like home page buttons */
-        .status-box {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px 24px;
-            background: #111624;
-            border-radius: 10px;
-            border: 2px solid #ffd84a55;
-            box-shadow: 0 0 18px #ffd84a33;
-            font-size: 1.1rem;
-            letter-spacing: 0.4px;
-            line-height: 1.6;
-        }
+    /* Base card */
+    .card {
+        background: #111624;
+        border-radius: 14px;
+        padding: 22px 26px;
+        margin-bottom: 28px;
+        border: 1px solid #0ff5;
+        box-shadow: 0 0 18px #0ff4;
+    }
 
-        .status-box:hover {
-            border-color: #ffd84a;
-            box-shadow: 0 0 26px #ffd84a;
-            transform: translateX(6px);
-            transition: 0.25s ease;
-        }
+    /* Small header card */
+    .title-card h1 {
+        margin: 0;
+        font-size: 2.1rem;
+        letter-spacing: 1px;
+        color: #ffffff;
+        text-shadow: 0 0 6px #0ff6;
+    }
 
-        /* Optional small footer */
-        .footer {
-            margin-top: 40px;
-            font-size: 0.9rem;
-            color: #ccc;
-            opacity: 0.7;
-        }
-    </style>
+    .subtitle {
+        margin-top: 10px;
+        font-size: 1.05rem;
+        letter-spacing: 0.4px;
+        opacity: 0.9;
+    }
+
+    /* Portfolio grid container */
+    .portfolio-card {
+        text-align: left;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+    }
+
+    /* Individual project cards */
+    .project {
+        background: #0e1220;
+        border-radius: 12px;
+        padding: 18px;
+        border: 1px solid #ffffff14;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .project h3 {
+        margin: 0 0 8px;
+        font-size: 1.2rem;
+        color: #ffffff;
+    }
+
+    .project p {
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        opacity: 0.9;
+    }
+
+    .status {
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        opacity: 0.7;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+    }
+
+    .project a {
+        margin-top: auto;
+        font-size: 0.9rem;
+        color: #0ff;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        width: fit-content;
+    }
+
+    .project a:hover {
+        border-bottom-color: #0ff;
+    }
+</style>
 </head>
 
 <body>
 
-<h1>Page Status: <span class="neon-yellow">In Progress</span></h1>
+<div class="container">
 
-<div class="status-box">
-    This page is currently under development.<br>
-    New content, features, and design updates are being built.<br><br>
-    Check back soon to explore the finished version.
+    <!-- SMALL CARD -->
+    <div class="card title-card">
+        <h1>Portfolio</h1>
+        <div class="subtitle">
+            Selected projects and ongoing work
+        </div>
+    </div>
+
+    <!-- BIG CARD -->
+    <div class="card portfolio-card">
+        <div class="grid">
+
+            <!-- PROJECT 1 -->
+            <div class="project">
+                <div>
+                    <h3>Save the Past</h3>
+                    <p>
+                        Automated system for transferring and preserving data from removable media.
+                    </p>
+                    <div class="status">Active</div>
+                </div>
+                <a href="https://savethepast.kervian.com" target="_blank">
+                    View Project
+                </a>
+            </div>
+
+            <!-- PROJECT 2 -->
+            <div class="project">
+                <div>
+                    <h3>Games Hub</h3>
+                    <p>
+                        Collection of small interactive browser-based games and experiments.
+                    </p>
+                    <div class="status">Active</div>
+                </div>
+                <a href="https://games.kervian.com" target="_blank">
+                    Visit Site
+                </a>
+            </div>
+
+            <!-- PROJECT 3 -->
+            <div class="project">
+                <div>
+                    <h3>Kervian Network</h3>
+                    <p>
+                        Multi-subdomain site structure with a shared design system.
+                    </p>
+                    <div class="status">Experimental</div>
+                </div>
+                <a href="https://kervian.com" target="_blank">
+                    View Network
+                </a>
+            </div>
+
+            <!-- PROJECT 4 -->
+            <div class="project">
+                <div>
+                    <h3>Build / Code / Create</h3>
+                    <p>
+                        Ongoing experiments and hands-on technical builds.
+                    </p>
+                    <div class="status">Stable</div>
+                </div>
+                <a href="https://build.kervian.com" target="_blank">
+                    Explore
+                </a>
+            </div>
+
+        </div>
+    </div>
+
 </div>
-
-<div class="footer">Kervian Network</div>
 
 </body>
 </html>
