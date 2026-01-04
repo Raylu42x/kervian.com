@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balloon Dodge Game</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: #87ceeb;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        display: block;
+        touch-action: none; /* Prevent scrolling while touching */
+    }
+    #scoreboard {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: #000;
+        font-size: 24px;
+    }
+</style>
+</head>
+<body>
+<div id="scoreboard">Score: 0 | High Score: 0</div>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let balloon = { x: canvas.width/2, y: canvas.height-150, radius: 30 };
+let balls = [];
+let score = 0;
+let highScore = localStorage.getItem('balloonHighScore') || 0;
+let inflating = false;
+let gameOver = false;
+
+// Generate balls
+for(let i=0; i<5; i++){
+    balls.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height/2,
+        radius: 20,
+        dx: (Math.random() * 4 - 2),
+        dy: (Math.random() * 4 - 2)
+    });
+}
+
+function update(){
+    if(gameOver) return;
+
+    // Inflate balloon
+    if(inflating){
+        balloon.radius += 0.5;
+        score += 0.1;
+        if(score > highScore){
+            highScore = Math.floor(score);
+            localStorage.setItem('balloonHighScore', highScore);
+        }
+    }
+
+    // Move balls
+    balls.forEach(b => {
+        b.x += b.dx;
+        b.y += b.dy;
+
+        // Bounce off edges
+        if(b.x - b.radius < 0 || b.x + b.radius > canvas.width) b.dx *= -1;
+        if(b.y - b.radius < 0 || b.y + b.radius > canvas.height) b.dy *= -1;
+
+        // Collision with balloon
+        let dist = Math.hypot(b.x - balloon.x, b.y - balloon.y);
+        if(dist < b.radius + balloon.radius){
+            gameOver = true;
+            alert('Game Over! Score: ' + Math.floor(score));
+            score = 0;
+            balloon.radius = 30;
+            gameOver = false;
+        }
+    });
+
+    draw();
+    requestAnimationFrame(update);
+}
+
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Draw balloon
+    ctx.beginPath();
+    ctx.arc(balloon.x, balloon.y, balloon.radius, 0, Math.PI*2);
+    ctx.fillStyle = 'red';
+    ctx.fill();
+    ctx.closePath();
+
+    // Draw balls
+    balls.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2);
+        ctx.fillStyle = 'blue';
+        ctx.fill();
+        ctx.closePath();
+    });
+
+    document.getElementById('scoreboard').innerText = 
+        `Score: ${Math.floor(score)} | High Score: ${highScore}`;
+}
+
+// Input handling
+// Desktop
+window.addEventListener('keydown', e => {
+    if(e.code === 'Space') inflating = true;
+});
+window.addEventListener('keyup', e => {
+    if(e.code === 'Space') inflating = false;
+});
+
+// Mobile / touch
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    inflating = true;
+});
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    inflating = false;
+});
+canvas.addEventListener('mousedown', () => inflating = true);
+canvas.addEventListener('mouseup', () => inflating = false);
+
+// Start game
+update();
+</script>
+</body>
+</html>

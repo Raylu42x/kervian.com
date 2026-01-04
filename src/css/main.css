@@ -1,0 +1,298 @@
+:root {
+  --neon-color: #00ff00; /* default glow color */
+}
+
+
+/* Neon glow colors per page */
+body.glow-green     { --neon-color: #00ff00; }  /* bright green */
+body.glow-blue      { --neon-color: #00f0ff; }  /* cyan/blue */
+body.glow-pink      { --neon-color: #ff00ff; }  /* hot pink */
+body.glow-purple    { --neon-color: #aa00ff; }  /* deep purple */
+body.glow-orange    { --neon-color: #ff6600; }  /* neon orange */
+body.glow-red       { --neon-color: #ff0000; }  /* bright red */
+body.glow-yellow    { --neon-color: #ffff00; }  /* neon yellow */
+body.glow-teal      { --neon-color: #00ffaa; }  /* teal/cyan-green */
+body.glow-lightblue { --neon-color: #66ccff; }  /* light blue */
+body.glow-white     { --neon-color: #ffffff; }  /* pure white */
+
+
+/* Reset & layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+/* Wrapper for sticky footer */
+.site-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Main content grows */
+.site-main {
+  flex: 1;
+  padding: 100px 1rem 2rem; /* top padding for logo overlap */
+}
+
+/* ----------------------------
+   Footer
+----------------------------- */
+.site-footer {
+  text-align: center;
+  padding: 1rem;
+  background: #111;
+  box-shadow: 0 0 10px var(--neon-color);
+}
+
+/* ----------------------------
+   Header
+----------------------------- */
+.site-header {
+  position: relative;
+  height: 60px;        /* fixed height for easy centering */
+  background: #111;
+  box-shadow: 0 0 20px var(--neon-color);
+  border-radius: 0.5rem;
+  z-index: 10;
+  padding: 0 1rem;     /* horizontal padding only */
+}
+
+/* Header flex/grid */
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;    /* vertical centering */
+  height: 100%;           /* fill the header */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+/* optional horizontal padding */
+
+
+
+.nav-internal a,
+.nav-external a {
+  color: #fff;          /* white text */
+  text-decoration: none; /* remove underline */
+  margin: 0 0.5rem;
+  font-weight: 500;
+}
+
+.nav-internal a:hover,
+.nav-external a:hover {
+  color: var(--neon-color);       /* neon hover effect */
+}
+
+.site-header .nav-internal a,
+.site-header .nav-external a {
+  color: #fff;
+  text-decoration: none;
+}
+
+
+/* Logo */
+.logo-wrapper {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin-top: -40px; /* overlap nav */
+}
+
+.logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #ccc;
+  background: #111;
+  box-shadow: 0 0 20px var(--neon-color), 0 0 40px var(--neon-color);
+  object-fit: cover;
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+/* Mobile menu */
+.mobile-menu {
+  display: none;
+  background: #111;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.mobile-menu nav a {
+  display: block;
+  padding: 0.5rem 0;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ----------------------------
+   Responsive
+----------------------------- */
+@media (max-width: 767px) {
+  .nav-internal,
+  .nav-external,
+  .logo-wrapper {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .mobile-menu.active {
+    display: flex;
+  }
+
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+}
+/* Homepage logo */
+.logo-home {
+  display: block;
+  margin: 2rem auto; /* center */
+  width: 150px;       /* adjust size */
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid #ccc;
+  background: #111;
+  box-shadow: 0 0 20px var(--neon-color), 0 0 40px var(--neon-color);
+  object-fit: cover;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px); /* fixed width */
+  justify-content: center;                        /* center the row */
+  gap: 1rem;                                     /* spacing between cards */
+  margin-top: 2rem;
+}
+
+
+
+
+.card {
+  width: 300px;
+  max-height: 350px;       /* optional */
+  padding: 1rem;
+  border: 1px solid var(--neon-color);
+  border-radius: 0.5rem;
+  box-sizing: border-box;  /* critical */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #111;
+}
+
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px var(--neon-color);
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.4;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;    /* limit to 3 lines */
+  -webkit-box-orient: vertical;
+}
+
+.card a {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Game cards */
+.card--game {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  padding: 1.4rem;
+  background: #111;
+  border: 1px solid var(--neon-color);
+  border-radius: 0.75rem;
+
+  text-decoration: none;
+  color: inherit;
+
+  box-shadow: 0 0 12px var(--neon-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card--game:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 22px var(--neon-color);
+}
+
+/* Title */
+.card-title {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+/* Short green divider */
+.card-divider {
+  width: 50px;               /* not full width */
+  height: 3px;
+  background: var(--neon-color);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--neon-color);
+}
+
+/* Description */
+.card-description {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #ccc;
+  margin: 0;
+}
