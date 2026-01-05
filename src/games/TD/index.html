@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Tower Defense</title>
+<style>
+body { margin:0; background:#222; display:flex; flex-direction:column; align-items:center; font-family:sans-serif; }
+canvas { background:#333; touch-action:none; }
+#ui { color:#fff; font-size:18px; margin:10px; }
+button { margin:5px; font-size:16px; padding:5px 10px; }
+</style>
+</head>
+<body>
+<div id="ui">
+Score: 0 | High Score: 0 | Money: 100 | Towers: 0/5<br>
+<button id="pauseBtn">Pause</button>
+<button id="restartBtn">Restart</button>
+</div>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let score = 0;
+let highScore = localStorage.getItem('tdHighScore') || 0;
+let money = 100;
+let towerLimit = 5;
+let paused = false;
+
+// Path for ground enemies
+const path = [
+    {x:50,y:50},{x:750,y:50},{x:750,y:550},{x:50,y:550},{x:50,y:300},{x:750,y:300}
+];
+
+let enemies = [];
+let towers = [];
+let projectiles = [];
+let spawnTimer = 0;
+
+// Enemy class
+class Enemy {
+    constructor(type='ground') {
+        this.type = type;
+        this.x = path[0].x;
+        this.y = path[0].y;
+        this.radius = 15;
+        this.baseHealth = 3 + Math.floor(score/5);
+        this.health = this.baseHealth;
+        this.speed = 1 + score/50;
+        this.pathIndex = 0;
+    }
+    update() {
+        if(this.type==='ground'){
+            if(this.pathIndex >= path.length-1) return;
+            const target = path[this.pathIndex+1];
+            const dx = target.x - this.x;
+            const dy = target.y - this.y;
+            const dist = Math.hypot(dx,dy);
+            if(dist < this.speed){
+                this.x = target.x;
+                this.y = target.y;
+                this.pathIndex++;
+            } else {
+                this.x += dx/dist*this.speed;
+                this.y += dy/dist*this.speed;
+            }
+        } else { // flying enemies go straight to exit
+            const exit = path[path.length-1];
+            const dx = exit.x - this.x;
+            const dy = exit.y - this.y;
+            const dist = Math.hypot(dx,dy);
+            this.x += dx/dist*this.speed;
+            this.y += dy/dist*this.speed;
+        }
+    }
+    draw() {
+        const intensity = Math.min(255, Math.floor(100 + (this.health/this.baseHealth)*155));
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+        ctx.fillStyle=`rgb(${intensity},0,0)`;
+        ctx.fill();
+        ctx.strokeStyle='black';
+        ctx.stroke();
+        ctx.closePath();
+
+        // health bar
+        ctx.fillStyle='green';
+        ctx.fillRect(this.x-this.radius,this.y-this.radius-6,(this.health/this.baseHealth)*this.radius*2,4);
+        ctx.strokeStyle='black';
+        ctx.strokeRect(this.x-this.radius,this.y-this.radius-6,this.radius*2,4);
+    }
+}
+
+// Tower class
+class Tower {
+    constructor(x,y,type='single'){
+        this.x = x;
+        this.y = y;
+        this.radius = 20;
+        this.range = 120;
+        this.fireRate = 30;
+        this.cooldown = 0;
+        this.type = type; // 'single' or 'aoe'
+        this.level = 1;
+    }
+    update(){
+        if(this.cooldown>0) this.cooldown--;
+        const targets = enemies.filter(e => Math.hypot(e.x-this.x,e.y-this.y)<this.range);
+        if(targets.length>0 && this.cooldown===0){
+            if(this.type==='single'){
+                projectiles.push(new Projectile(this.x,this.y,targets[0],10*this.level));
+            } else { // AoE projectile hits all in range
+                targets.forEach(t=>projectiles.push(new Projectile(this.x,this.y,t,5*this.level)));
+            }
+            this.cooldown = this.fireRate;
+        }
+    }
+    draw(){
+        ctx.fillStyle = this.type==='single'?'blue':'purple';
+        ctx.fillRect(this.x-this.radius,this.y-this.radius,this.radius*2,this.radius*2);
+        ctx.strokeStyle='white';
+        ctx.strokeRect(this.x-this.radius,this.y-this.radius,this.radius*2,this.radius*2);
+    }
+    upgrade(){
+        if(money >= 50){
+            this.level++;
+            money -= 50;
+        }
+    }
+}
+
+// Projectile class
+class Projectile {
+    constructor(x,y,target,damage){
+        this.x = x;
+        this.y = y;
+        this.target = target;
+        this.radius = 5;
+        this.speed = 5;
+        this.damage = damage;
+    }
+    update(){
+        if(!this.target) return false;
+        const dx = this.target.x - this.x;
+        const dy = this.target.y - this.y;
+        const dist = Math.hypot(dx,dy);
+        if(dist < this.speed){
+            this.target.health -= this.damage;
+            if(this.target.health<=0){
+                score++;
+                money += 10;
+                if(score>highScore){ highScore = score; localStorage.setItem('tdHighScore', highScore);}
+                enemies.splice(enemies.indexOf(this.target),1);
+            }
+            return true;
+        } else {
+            this.x += dx/dist*this.speed;
+            this.y += dy/dist*this.speed;
+        }
+    }
+    draw(){
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+        ctx.fillStyle='yellow';
+        ctx.fill();
+        ctx.closePath();
+    }
+}
+
+// Spawn enemies
+function spawnEnemies(){
+    spawnTimer--;
+    if(spawnTimer<=0){
+        const count = 1 + Math.floor(score/20);
+        for(let i=0;i<count;i++){
+            enemies.push(new Enemy('ground'));
+            if(score > 15 && Math.random()<0.3) enemies.push(new Enemy('flying')); // flying enemy
+        }
+        spawnTimer = Math.max(20, 90 - Math.floor(score/10));
+    }
+}
+
+// Game loop
+function update(){
+    if(paused){ requestAnimationFrame(update); return; }
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    spawnEnemies();
+    enemies.forEach(e=>{ e.update(); e.draw(); });
+    towers.forEach(t=>{ t.update(); t.draw(); });
+    projectiles = projectiles.filter(p=>{ const r = p.update(); p.draw(); return !r; });
+
+    // Draw path
+    ctx.beginPath();
+    ctx.strokeStyle='yellow';
+    ctx.lineWidth=3;
+    ctx.moveTo(path[0].x,path[0].y);
+    for(let p of path) ctx.lineTo(p.x,p.y);
+    ctx.stroke();
+    ctx.closePath();
+
+    towerLimit = 5 + Math.floor(score/10);
+
+    document.getElementById('ui').innerHTML =
+        `Score: ${score} | High Score: ${highScore} | Money: ${money} | Towers: ${towers.length}/${towerLimit}<br>`+
+        `<button id="pauseBtn">Pause</button> <button id="restartBtn">Restart</button>`;
+
+    document.getElementById('pauseBtn').onclick = ()=>{ paused = !paused; };
+    document.getElementById('restartBtn').onclick = ()=>{ resetGame(); };
+
+    requestAnimationFrame(update);
+}
+
+// Place tower
+function placeTower(x,y){
+    if(towers.length < towerLimit && money >= 50){
+        towers.push(new Tower(x,y, Math.random()<0.5?'single':'aoe'));
+        money -= 50;
+    }
+}
+
+// Reset game
+function resetGame(){
+    enemies=[];
+    projectiles=[];
+    towers=[];
+    score=0;
+    money=100;
+}
+
+// Input
+canvas.addEventListener('click', e=>{
+    const rect = canvas.getBoundingClientRect();
+    placeTower(e.clientX - rect.left, e.clientY - rect.top);
+});
+canvas.addEventListener('touchstart', e=>{
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    placeTower(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+}, {passive:false});
+
+update();
+</script>
+</body>
+</html>
