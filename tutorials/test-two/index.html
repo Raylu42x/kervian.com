@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Build X</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body class="glow-orange">
+
+  <div class="site-wrapper">
+    <header class="site-header">
+<div class="header-inner">
+  <!-- Internal links -->
+  <nav class="nav-internal">
+    <a href="/">Home</a>
+    <a href="/projects/">Projects</a>
+    <a href="/tutorials/">Tutorials</a>
+    <a href="/games/">Games</a>
+    <a href="/portfolio/">Portfolio</a>
+    <a href="/about/">About</a>
+  </nav>
+
+  <!-- External/subdomain links -->
+  <nav class="nav-external">
+    <a href="https://tools.kervian.com">Tools</a>
+    <a href="https://docs.kervian.com">Docs</a>
+    <a href="https://status.kervian.com">Status</a>
+  </nav>
+
+  <!-- Hamburger button -->
+  <button class="hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</div>
+
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu">
+    <nav>
+      <a href="/">Home</a>
+      <a href="/projects/">Projects</a>
+      <a href="/tutorials/">Tutorials</a>
+      <a href="/games/">Games</a>
+      <a href="/portfolio/">Portfolio</a>
+      <a href="/about/">About</a>
+      <a href="https://tools.kervian.com">Tools</a>
+      <a href="https://docs.kervian.com">Docs</a>
+      <a href="https://status.kervian.com">Status</a>
+    </nav>
+  </div>
+</header>
+
+
+    <main class="site-main">
+      <h1>How to Build X</h1>
+<p>This is the tutorial content copied nothing</p>
+
+    </main>
+
+    <footer class="site-footer">
+  <p>© Bennett. This work is licensed under [CC BY‑NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/), which allows others to copy, share, and adapt it non-commercially with proper credit.</p>
+</footer>
+
+  </div>
+
+  <script>
+    // Hamburger menu toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const hamburger = document.querySelector(".hamburger");
+      const mobileMenu = document.querySelector(".mobile-menu");
+
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener("click", () => {
+          hamburger.classList.toggle("active");
+          mobileMenu.classList.toggle("active");
+        });
+      }
+    });
+  </script>
+<body class="glow-orange">
+
+</html>
