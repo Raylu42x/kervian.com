@@ -48,6 +48,20 @@ html, body {
   box-shadow: 0 0 10px var(--neon-color);
 }
 
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer a.footer-link {
+  color: inherit;        /* use footer text color */
+  text-decoration: none; /* remove underline */
+  border-bottom: 1px solid rgba(255,255,255,0.3); /* subtle underline */
+}
+
+.site-footer a.footer-link:hover {
+  border-bottom-color: var(--neon-color);
+}
+
 /* ----------------------------
    Header
 ----------------------------- */
@@ -295,4 +309,61 @@ html, body {
   line-height: 1.5;
   color: #ccc;
   margin: 0;
+}
+.video-embed {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+}
+
+.video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.site-footer {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem; /* space between the three sections */
+
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background: #111;
+  box-shadow: 0 0 10px var(--neon-color);
+  font-size: 0.85rem;
+}
+
+/* Keep nav links inline */
+.footer-nav {
+  display: flex;
+  gap: 1.25rem;
+}
+
+/* Links */
+.site-footer a {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.site-footer a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* 📱 Stack on small screens */
+@media (max-width: 700px) {
+  .site-footer {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .footer-nav {
+    justify-content: center;
+  }
 }

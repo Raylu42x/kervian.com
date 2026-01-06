@@ -20,6 +20,9 @@ module.exports = function(eleventyConfig) {
     });
   });
 
+
+  eleventyConfig.addGlobalData("year", () => new Date().getFullYear());
+
   // Passthrough copy for CSS
   eleventyConfig.addPassthroughCopy({"src/css": "css"});
 

@@ -7,7 +7,7 @@ bodyClass: glow-orange
 # Tutorials
 
 <div class="card-grid">
-{% for tutorial in collections.tutorials | reverse %}
+{% for tutorial in collections.tutorials %}
   <div class="card">
     <a href="{{ tutorial.url }}">
       <h2>{{ tutorial.data.title }}</h2>

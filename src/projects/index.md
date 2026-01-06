@@ -7,7 +7,7 @@ bodyClass: glow-purple
 # Projects
 
 <div class="card-grid">
-{% for project in collections.projects | reverse %}
+{% for project in collections.projects %}
   <div class="card">
     <a href="{{ project.url }}">
       <h2>{{ project.data.title }}</h2>
