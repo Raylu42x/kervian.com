@@ -11,7 +11,7 @@ excerpt: The Robo Cats are a FLL team that made it to the simifinals.
 
 Our innovation project helps archeoalogests easily move data off any type of storage media to the cloud using a raspberry pi and rclone
 
-You can learn more here: [savethepast.kervian.com](/projects/fll-2025-26/site/)
+You can learn more here: [Click Me](/projects/fll-2025-26/site/)
 
 ## Robot Game
 
