@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Save The Past</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 40px auto;
+            max-width: 900px;
+            line-height: 1.6;
+            color: #222;
+        }
+        h1 {
+            font-size: 42px;
+            margin-bottom: 0;
+        }
+        h2 {
+            margin-top: 5px;
+            font-weight: 300;
+            font-size: 24px;
+        }
+        h3 {
+            margin-top: 40px;
+            font-size: 22px;
+        }
+        a {
+            color: #0056cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .links a {
+            display: block;
+            margin: 6px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Save The Past</h1>
+<h2>One Floppy Disk At A Time</h2>
+
+<h3>Problem</h3>
+<p>
+    A massive portion of archaeological documentation created in the last century is quietly disappearing.
+    Magnetic media decays. Drives fail. Formats become unreadable. The result: primary research records are
+    being lost faster than they can be preserved, pushing us toward a digital dark age of archaeology.
+</p>
+
+<h3>Our Approach</h3>
+<p>
+    We built a compact, automated ingestion system using a Raspberry Pi. The device captures data from
+    legacy disks and drives, transfers the files to safe cloud storage, and documents the media’s contents
+    for later reference. Once a drive is plugged in, the system handles the entire process without
+    human intervention.
+</p>
+
+<h3>How It Works</h3>
+<ol>
+    <li>A drive is connected to the Raspberry Pi.</li>
+    <li>The Pi automatically identifies the device.</li>
+    <li>All files are copied to secure local storage.</li>
+    <li>The system generates a notes file describing the drive’s structure and contents.</li>
+    <li>If internet access is available, files are synced to OneDrive immediately.</li>
+    <li>If offline, syncing is deferred until the next connection.</li>
+</ol>
+
+<h3>Why It Matters</h3>
+<p>
+    Archaeological field data is irreplaceable. You only excavate a site once. If the documentation disappears,
+    the knowledge disappears with it. Preserving these digital records ensures that researchers, historians,
+    and future generations can continue to learn from work that cannot be repeated.
+</p>
+
+<h3>Explore More</h3>
+<footer class="bottom-nav">
+  <a href="https://savethepast.kervian.com/team" class="nav-link">Team</a>
+  <a href="https://savethepast.kervian.com/process" class="nav-link">Process</a>
+  <a href="https://savethepast.kervian.com/prototype" class="nav-link">Prototype</a>
+</footer>
+
+<style>
+  .bottom-nav {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background: #f5f5f5;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-family: Arial, sans-serif;
+  }
+
+  .bottom-nav .nav-link {
+    text-decoration: none;
+    color: #444;
+    font-weight: 600;
+  }
+
+  .bottom-nav .nav-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Makes spacing nicer on small screens */
+  @media (max-width: 600px) {
+    .bottom-nav {
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: center;
+    }
+  }
+</style>
+
+
+<p>
+    Questions: 
+    <strong><a href="mailto:lego67278@outlook.com">lego67278@outlook.com</a></strong>
+</p>
+
+</body>
+</html>
