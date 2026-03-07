@@ -1,7 +1,7 @@
 ---
 layout: base.njk
 title: Project Balloon Bunch
-tags: project
+tags: [project, portfolio]
 bodyClass: glow-purple
 excerpt: This project tells how we launched a fleet of balloons into the sky with a payload.
 ---

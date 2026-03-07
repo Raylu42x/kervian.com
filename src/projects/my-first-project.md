@@ -1,7 +1,7 @@
 ---
 layout: base.njk
 title: My First 11ty Project
-tags: project
+tags: [project, portfolio]
 bodyClass: glow-purple
 excerpt: This project demonstrates how to do 11ty with vs code.
 ---
