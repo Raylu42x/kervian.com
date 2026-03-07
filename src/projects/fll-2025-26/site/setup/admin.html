@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSH System Demo Guide</title>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --accent: #38bdf8; --code: #000; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: 900px; margin: auto; }
+        h1 { color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        h2 { margin-top: 2rem; color: #94a3b8; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        .command-block { background: var(--code); padding: 1rem; border-radius: 8px; position: relative; margin: 10px 0; border-left: 4px solid var(--accent); }
+        code { font-family: 'Fira Code', monospace; color: #a5f3fc; font-size: 0.95rem; }
+        .description { font-size: 0.9rem; color: #94a3b8; margin-bottom: 5px; }
+        .label { display: inline-block; background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Data Super Hero: Demo Guide</h1>
+    <p>Use these commands to demonstrate the ingest, upload, and monitoring flow.</p>
+
+    <h2>1. The "Magic" Trigger (Manual Test)</h2>
+    <div class="description">Run this to create a dummy drive folder and trigger the upload service.</div>
+    <div class="command-block">
+        <code>
+            mkdir -p /data/ingest/DEMO_DRIVE_001 <br>
+            echo '{"ingest": "complete", "upload": "pending"}' > /data/ingest/DEMO_DRIVE_001/status.json
+        </code>
+    </div>
+
+    <h2>2. Watch the Brain (Service Logs)</h2>
+    <div class="description">Show the live logs as the script detects the new folder and starts Rclone.</div>
+    <div class="command-block">
+        <code>sudo journalctl -u upload_service.service -f</code>
+    </div>
+
+    <h2>3. Status Dashboard</h2>
+    <div class="description">The URL to show on your phone or tablet during the demo.</div>
+    <div class="command-block">
+        <code>http://autocopy.local:5000</code>
+    </div>
+
+    <h2>4. Emergency Fixes</h2>
+    <div class="description">If you get a "Permission Denied" error during the demo:</div>
+    <div class="command-block">
+        <code>sudo chown -R pi:pi /data/ingest && sudo chmod -R 755 /data/ingest</code>
+    </div>
+    <div class="description">To restart the engine:</div>
+    <div class="command-block">
+        <code>sudo systemctl restart upload_service.service</code>
+    </div>
+
+    <h2>5. Verify Cloud</h2>
+    <div class="description">Check if the files actually landed in Google Drive via CLI:</div>
+    <div class="command-block">
+        <code>rclone lsd gdrive:DataSuperHero_Uploads</code>
+    </div>
+
+</body>
+</html>
