@@ -108,6 +108,36 @@ html, body {
 }
 
 
+/* ----------------------------
+   Banner
+----------------------------- */
+.site-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #111;
+  border-bottom: 1px solid var(--neon-color);
+  box-shadow: 0 2px 8px var(--neon-color);
+  color: #eee;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.site-banner__content p { margin: 0; }
+.site-banner__content a { color: var(--neon-color); }
+
+.site-banner__close {
+  background: none;
+  border: 1px solid currentColor;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.1rem 0.5rem;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
 /* Logo */
 .logo-wrapper {
   display: flex;

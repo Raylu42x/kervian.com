@@ -1,0 +1,13 @@
+{% if banner.active and banner.message %}
+<div class="site-banner" id="site-banner">
+  <div class="site-banner__content">{{ banner.message | markdown | safe }}</div>
+  {% if page.url !== '/' %}
+  <button class="site-banner__close" aria-label="Dismiss banner" onclick="document.getElementById('site-banner').style.display='none';sessionStorage.setItem('bannerDismissed','1');">&#x2715;</button>
+  {% endif %}
+</div>
+<script>
+  if (sessionStorage.getItem('bannerDismissed')) {
+    document.getElementById('site-banner').style.display = 'none';
+  }
+</script>
+{% endif %}

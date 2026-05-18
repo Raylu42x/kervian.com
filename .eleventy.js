@@ -1,4 +1,9 @@
+const markdownIt = require('markdown-it');
+const md = markdownIt();
+
 module.exports = function(eleventyConfig) {
+  eleventyConfig.addFilter('markdown', (content) => md.render(content || ''));
+
   // Projects collection
   eleventyConfig.addCollection("projects", function(collectionApi) {
     return collectionApi.getAll().filter(item => (item.data.tags || []).includes("project"));
