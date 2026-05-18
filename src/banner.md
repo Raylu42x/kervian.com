@@ -1,5 +1,5 @@
 ---
-active: false
+active: true
 permalink: false
 ---
-Site announcement goes here.
+This site is still a work in progress

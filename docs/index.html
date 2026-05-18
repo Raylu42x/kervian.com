@@ -57,6 +57,17 @@
 </header>
 
     
+<div class="site-banner" id="site-banner">
+  <div class="site-banner__content"><p>This site is still a work in progress</p>
+</div>
+  
+</div>
+<script>
+  if (sessionStorage.getItem('bannerDismissed')) {
+    document.getElementById('site-banner').style.display = 'none';
+  }
+</script>
+
 
 
     <main class="site-main">
