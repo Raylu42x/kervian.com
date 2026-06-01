@@ -57,30 +57,11 @@
 </header>
 
     
-<div class="site-banner" id="site-banner">
-  <div class="site-banner__content"><p>This site is still a work in progress</p>
-</div>
-  
-  <button class="site-banner__close" aria-label="Dismiss banner" onclick="document.getElementById('site-banner').style.display='none';sessionStorage.setItem('bannerDismissed','1');">&#x2715;</button>
-  
-</div>
-<script>
-  if (sessionStorage.getItem('bannerDismissed')) {
-    document.getElementById('site-banner').style.display = 'none';
-  }
-</script>
-
 
 
     <main class="site-main">
       <h1>Projects</h1>
 <div class="card-grid">
-  <div class="card">
-    <a href="/projects/balloon-b-retelling/">
-      <h2>The Balloon Bunch Retelling</h2>
-      <p>I retold the story of the balloon bunch in stop motion and it is not great</p>
-    </a>
-  </div>
   <div class="card">
     <a href="/projects/balloon-bunch/">
       <h2>Project Balloon Bunch</h2>
@@ -94,15 +75,21 @@
     </a>
   </div>
   <div class="card">
-    <a href="/projects/test-two/">
-      <h2>My Project Test</h2>
-      <p>This project demonstrates how to do X with Y.</p>
+    <a href="/projects/balloon-b-retelling/">
+      <h2>The Balloon Bunch Retelling</h2>
+      <p>I retold the story of the balloon bunch in stop motion and it is not great</p>
     </a>
   </div>
   <div class="card">
     <a href="/projects/my-first-project/">
       <h2>My First 11ty Project</h2>
       <p>This project demonstrates how to do 11ty with vs code.</p>
+    </a>
+  </div>
+  <div class="card">
+    <a href="/projects/test-two/">
+      <h2>My Project Test</h2>
+      <p>This project demonstrates how to do X with Y.</p>
     </a>
   </div>
   <div class="card">
