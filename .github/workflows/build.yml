@@ -1,5 +1,8 @@
 name: Build Eleventy site
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -19,6 +22,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use Node.js
         uses: actions/setup-node@v5
