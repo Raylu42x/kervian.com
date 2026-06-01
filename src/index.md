@@ -10,4 +10,4 @@ bodyClass: glow-green
 
 # Welcome to Kervian
 
-Your homepage content goes here.
+This is the hub of my empire 
