@@ -37,13 +37,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          branch="$GITHUB_REF_NAME"
+          git fetch origin "$branch"
+          git rebase "origin/$branch"
           git add docs
           if git diff --cached --quiet; then
             echo "No docs changes to commit."
           else
-            branch="$GITHUB_REF_NAME"
-            git fetch origin "$branch"
-            git rebase "origin/$branch"
             git commit -m "chore: build site [skip ci]"
             git push --force-with-lease origin HEAD:"$branch"
           fi
