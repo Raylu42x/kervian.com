@@ -41,8 +41,10 @@ jobs:
           if git diff --cached --quiet; then
             echo "No docs changes to commit."
           else
+            git fetch origin main
+            git rebase origin/main
             git commit -m "chore: build site [skip ci]"
-            git push
+            git push --force-with-lease origin HEAD:main
           fi
 
       - name: List generated site files
