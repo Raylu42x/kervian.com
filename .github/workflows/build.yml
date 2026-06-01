@@ -26,6 +26,15 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Rebase branch onto remote
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          branch="$GITHUB_REF_NAME"
+          git fetch origin "$branch"
+          git rebase "origin/$branch"
+
       - name: Install dependencies
         run: npm install
 
@@ -38,8 +47,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           branch="$GITHUB_REF_NAME"
-          git fetch origin "$branch"
-          git rebase "origin/$branch"
           git add docs
           if git diff --cached --quiet; then
             echo "No docs changes to commit."
