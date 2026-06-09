@@ -1,0 +1,126 @@
+backend:
+  name: github
+  repo: Raylu42x/kervian.com
+  branch: main
+  # No base_url set: login uses Sveltia's "Sign In with Token" (Personal Access Token) flow.
+  # If you later deploy your own sveltia-cms-auth Cloudflare Worker, uncomment and set:
+  # base_url: https://sveltia-cms-auth.<your-subdomain>.workers.dev
+
+media_folder: src/uploads
+public_folder: /uploads
+
+site_url: https://kervian.com
+
+collections:
+  - name: pages
+    label: Site Pages
+    label_singular: Page
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: home
+        label: Home (/)
+        file: src/index.md
+        fields:
+          - { name: layout, label: Layout, widget: string, default: base.njk }
+          - { name: title, label: Title, widget: string }
+          - { name: bodyClass, label: bodyClass (glow color), widget: string, required: false }
+          - { name: body, label: Body, widget: text }
+
+      - name: about
+        label: About (/about/)
+        file: src/about/index.md
+        fields:
+          - { name: layout, label: Layout, widget: string, default: base.njk }
+          - { name: title, label: Title, widget: string }
+          - { name: bodyClass, label: bodyClass (glow color), widget: string, required: false }
+          - { name: body, label: Body, widget: text }
+
+      - name: portfolio
+        label: Portfolio (/portfolio/)
+        file: src/portfolio/index.md
+        fields:
+          - { name: layout, label: Layout, widget: string, default: base.njk }
+          - { name: title, label: Title, widget: string }
+          - { name: bodyClass, label: bodyClass (glow color), widget: string, required: false }
+          - { name: body, label: Body, widget: text }
+
+      - name: projects_index
+        label: Projects index (/projects/)
+        file: src/projects/index.md
+        fields:
+          - { name: layout, label: Layout, widget: string, default: base.njk }
+          - { name: title, label: Title, widget: string }
+          - { name: bodyClass, label: bodyClass (glow color), widget: string, required: false }
+          - { name: body, label: Body, widget: text }
+
+      - name: tutorials_index
+        label: Tutorials index (/tutorials/)
+        file: src/tutorials/index.md
+        fields:
+          - { name: layout, label: Layout, widget: string, default: base.njk }
+          - { name: title, label: Title, widget: string }
+          - { name: bodyClass, label: bodyClass (glow color), widget: string, required: false }
+          - { name: body, label: Body, widget: text }
+
+      - name: banner
+        label: Site banner
+        file: src/banner.md
+        fields:
+          - { name: active, label: active (show banner?), widget: boolean, default: false }
+          - { name: permalink, label: permalink, widget: string, default: "false" }
+          - { name: body, label: Banner text, widget: text }
+
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: src/projects
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    preview_path: projects/{{slug}}
+    # Only show real project entries — excludes src/projects/index.md (the listing page)
+    filter:
+      field: tags
+      value: project
+    fields:
+      - { name: layout, label: Layout, widget: string, default: base.njk }
+      - { name: title, label: Title, widget: string }
+      - name: tags
+        label: tags (Show on)
+        widget: select
+        multiple: true
+        default: [project, portfolio]
+        options:
+          - { label: "Projects page (/projects/)", value: project }
+          - { label: "Portfolio page (/portfolio/)", value: portfolio }
+      - { name: featured, label: Featured on homepage?, widget: boolean, default: false, required: false }
+      - { name: excerpt, label: Excerpt (card description), widget: text }
+      - { name: bodyClass, label: bodyClass (glow color), widget: string, default: glow-purple, required: false }
+      - { name: portfolioImage, label: Portfolio image, widget: image, required: false }
+      - { name: body, label: Body, widget: text }
+
+  - name: tutorials
+    label: Tutorials
+    label_singular: Tutorial
+    folder: src/tutorials
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    preview_path: tutorials/{{slug}}
+    # Only show real tutorial entries — excludes src/tutorials/index.md (the listing page)
+    filter:
+      field: tags
+      value: build
+    fields:
+      - { name: layout, label: Layout, widget: string, default: base.njk }
+      - { name: title, label: Title, widget: string }
+      - { name: tags, label: tags, widget: string, default: build }
+      - { name: excerpt, label: Excerpt (card description), widget: text }
+      - { name: bodyClass, label: bodyClass (glow color), widget: string, default: glow-orange, required: false }
+      - { name: body, label: Body, widget: text }

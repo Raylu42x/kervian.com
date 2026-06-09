@@ -32,6 +32,7 @@ docs/             # Built site output (Cloudflare Pages deployment target)
 ## Guides
 
 - [Content Guide](./content-guide.md) — adding projects, tutorials, and featured projects (with full frontmatter reference)
+- [Admin Panel](./admin.md) — using the `/admin/` web UI to create posts without touching code
 
 ## Banner
 
