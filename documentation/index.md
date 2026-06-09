@@ -29,6 +29,10 @@ docs/             # Built site output (Cloudflare Pages deployment target)
 
 > `docs/` is the static site output directory — it's excluded from the documentation site via `.no-docs`. Markdown docs live in `documentation/` instead.
 
+## Guides
+
+- [Content Guide](./content-guide.md) — adding projects, tutorials, and featured projects (with full frontmatter reference)
+
 ## Banner
 
 To show a sitewide announcement, edit `src/banner.md`:
