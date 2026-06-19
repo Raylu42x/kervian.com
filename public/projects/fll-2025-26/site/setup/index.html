@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prototype Setup Guide</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h1, h2, h3 {
+      color: #333;
+    }
+    pre {
+      background: #eee;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    a {
+      color: #1a73e8;
+    }
+    code {
+      background: #ddd;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .note {
+      background: #fffae6;
+      border-left: 4px solid #ffcc00;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    details {
+      margin-bottom: 15px;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+      padding: 5px;
+      background: #ddd;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>How to Setup Our Prototype</h1>
+  <p>This guide walks you through setting up a Raspberry Pi Zero 2 W to automatically import and upload files from external drives to OneDrive. You’ll need:</p>
+  <ul>
+    <li>Raspberry Pi Zero 2 W</li>
+    <li>Computer for setup</li>
+    <li>MicroSD card (8GB+ recommended)</li>
+    <li>External drives to test</li>
+  </ul>
+
+  <div class="note">
+    <strong>Note:</strong> This guide will be updated for troubleshooting and additional tips as we improve the process.
+  </div>
+
+  <h2>1. Flash an SD Card with Raspberry Pi OS</h2>
+  <ol>
+    <li>Download the <a href="https://www.raspberrypi.com/software/" target="_blank">Raspberry Pi Imager</a>.</li>
+    <li>Open it, insert your SD card, and flash <strong>Raspberry Pi OS 64-bit Lite</strong>.</li>
+    <li>Enable <strong>SSH</strong> and configure <strong>Wi-Fi</strong> during setup.</li>
+  </ol>
+
+  <h2>2. Install and Configure Rclone</h2>
+  <pre><code>sudo apt update
+sudo apt install rclone -y
+rclone config</code></pre>
+  <p>Follow prompts to set up your cloud service. Use <strong>Ctrl+C</strong> to exit when done.</p>
+
+  <h2>3. Create Directories</h2>
+  <pre><code>mkdir -p ~/autocopy/devices
+mkdir -p ~/autocopy/logs</code></pre>
+
+  <h2>4. Worker Script</h2>
+  <details>
+    <summary>Create/Edit <code>import_worker.sh</code></summary>
+    <p>Run:</p>
+    <pre><code>nano ~/autocopy/import_worker.sh</code></pre>
+    <p>Paste this entire worker script:</p>
+    <pre><code>
+#!/bin/bash
+# import_worker.sh
+set -eu
+BASE_DIR="$HOME/autocopy"
+DEVICES_DIR="$BASE_DIR/devices"
+LOG_DIR="$BASE_DIR/logs"
+RCLONE_REMOTE="onedrive"
+DASHBOARD_URL="http://localhost:8080"
+
+DEVICE_KERNEL="$1"
+if [[ -z "$DEVICE_KERNEL" ]]; then
+  echo "No device specified. Usage: $0 sda"
+  exit 1
+fi
+
+TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+LOGFILE="$LOG_DIR/${DEVICE_KERNEL}_$TIMESTAMP.log"
+exec > >(tee -a "$LOGFILE") 2>&1
+
+echo "=== START import for device $DEVICE_KERNEL at $(date) ==="
+
+LOCKDIR="/tmp/autocopy_lock_${DEVICE_KERNEL}"
+if ! mkdir "$LOCKDIR" 2>/dev/null; then
+  echo "Another job is running for $DEVICE_KERNEL — exiting."
+  exit 0
+fi
+trap 'rm -rf "$LOCKDIR"; echo "Lock removed";' EXIT
+
+DEV_PREFIX="/dev/$DEVICE_KERNEL"
+PARTS=$(lsblk -ln -o NAME "/dev/$DEVICE_KERNEL" | tail -n +2 || true)
+if [[ -z "$PARTS" ]]; then
+  PARTS="$DEVICE_KERNEL"
+fi
+FIRST_PART=$(echo "$PARTS" | awk '{print $1}')
+LABEL=$(lsblk -no LABEL "/dev/$FIRST_PART" 2>/dev/null || true)
+[ -z "$LABEL" ] && LABEL="$DEVICE_KERNEL"
+SANITIZED_LABEL=$(echo "$LABEL" | tr ' /' '__')
+TARGET_BASE="$DEVICES_DIR/$SANITIZED_LABEL"
+
+pick_remote_name() {
+  local base="$1"
+  if rclone lsd "${RCLONE_REMOTE}:/autocopy/${base}" >/dev/null 2>&1; then
+    local i=2
+    while rclone lsd "${RCLONE_REMOTE}:/autocopy/${base}-${i}" >/dev/null 2>&1; do
+      i=$((i+1))
+    done
+    echo "${base}-${i}"
+  else
+    echo "$base"
+  fi
+}
+
+REMOTE_NAME=$(pick_remote_name "$SANITIZED_LABEL")
+mkdir -p "$TARGET_BASE"
+
+RSYNC_EXCLUDES=(
+  --exclude='System Volume Information/'
+  --exclude='FOUND.*'
+  --exclude='$RECYCLE.BIN/'
+  --exclude='Recycler/'
+  --exclude='Thumbs.db'
+  --exclude='desktop.ini'
+  --exclude='.DS_Store'
+  --exclude='.Trashes'
+  --exclude='/.Spotlight-V100/'
+  --exclude='/.fseventsd/'
+  --exclude='__MACOSX/'
+  --exclude='lost+found/'
+  --exclude='pagefile.sys'
+  --exclude='hiberfil.sys'
+  --exclude='*.tmp'
+)
+
+for part in $PARTS; do
+  DEVPATH="/dev/$part"
+  MOUNT_POINT=$(lsblk -no MOUNTPOINT "$DEVPATH" 2>/dev/null || true)
+  if [[ -z "$MOUNT_POINT" ]]; then
+    MOUNT_OUTPUT=$(udisksctl mount -b "$DEVPATH" 2>&1) || continue
+    MOUNT_POINT=$(echo "$MOUNT_OUTPUT" | grep -o "/media/[^ ]*" || true)
+    [ -z "$MOUNT_POINT" ] && continue
+  fi
+  rsync -a --info=progress2 "${RSYNC_EXCLUDES[@]}" "$MOUNT_POINT"/ "$TARGET_BASE"/
+  udisksctl unmount -b "$DEVPATH" >/dev/null || true
+  udisksctl power-off -b "$DEVPATH" >/dev/null || true
+done
+
+NOTES_FILE="$TARGET_BASE/.notes.txt"
+if [[ ! -f "$NOTES_FILE" ]]; then
+  echo "Imported from device: $SANITIZED_LABEL" > "$NOTES_FILE"
+  echo "Imported at: $(date)" >> "$NOTES_FILE"
+  echo "" >> "$NOTES_FILE"
+  echo "Directory listing:" >> "$NOTES_FILE"
+  (cd "$TARGET_BASE" && find . -print | sed 's|^\./||' >> "$NOTES_FILE")
+fi
+
+REMOTE_DEST="${RCLONE_REMOTE}:/autocopy/${REMOTE_NAME}"
+rclone copy "$TARGET_BASE" "$REMOTE_DEST" --transfers=4 --checkers=8 --retries 3 --low-level-retries 3 --stats-one-line --stats 10s || true
+
+if command -v curl >/dev/null 2>&1; then
+  curl -s "$DASHBOARD_URL/start/$SANITIZED_LABEL" >/dev/null 2>&1 || true
+fi
+
+echo "Import complete for $SANITIZED_LABEL at $(date)"
+echo "Log file: $LOGFILE"
+    </code></pre>
+    <p>Then make it executable:</p>
+    <pre><code>chmod +x ~/autocopy/import_worker.sh</code></pre>
+  </details>
+
+  <h2>5. Wrapper Script</h2>
+  <details>
+    <summary>Create/Edit <code>auto_import_wrapper.sh</code></summary>
+    <pre><code>sudo nano /usr/local/bin/auto_import_wrapper.sh</code></pre>
+    <p>Paste this content:</p>
+    <pre><code>
+#!/bin/bash
+DEVICE_KERNEL="$1"
+if [[ -z "$DEVICE_KERNEL" ]]; then
+  exit 0
+fi
+sleep 1
+sudo -u pi /home/pi/autocopy/import_worker.sh "$DEVICE_KERNEL" &
+    </code></pre>
+    <p>Set permissions:</p>
+    <pre><code>sudo chmod 755 /usr/local/bin/auto_import_wrapper.sh
+sudo chown root:root /usr/local/bin/auto_import_wrapper.sh</code></pre>
+  </details>
+
+  <h2>6. Udev Rule</h2>
+  <details>
+    <summary>Create/Edit <code>99-autocopy.rules</code></summary>
+    <pre><code>sudo nano /etc/udev/rules.d/99-autocopy.rules</code></pre>
+    <p>Paste this:</p>
+    <pre><code>KERNEL=="sd[b-z]*", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/local/bin/auto_import_wrapper.sh %k"</code></pre>
+    <p>Reload udev rules:</p>
+    <pre><code>sudo udevadm control --reload-rules
+sudo udevadm trigger</code></pre>
+  </details>
+
+  <h2>7. Test the Setup</h2>
+  <pre><code>tail -F ~/autocopy/logs/*.log</code></pre>
+
+  <h2>8. Tips & Troubleshooting</h2>
+  <ul>
+    <li>Make sure the Pi user has sudo permissions without password for scripts that require root.</li>
+    <li>Check SD card health if Pi fails to boot.</li>
+    <li>Use <code>lsblk</code> to verify that devices and partitions are recognized.</li>
+    <li>If rclone fails, try <code>rclone copy --progress</code> manually to debug.</li>
+    <li>Keep scripts under <code>~/autocopy</code> for easy maintenance.</li>
+  </ul>
+
+  <h2>9. Optional Enhancements</h2>
+  <ul>
+    <li>Add email notifications or dashboard alerts on successful uploads.</li>
+    <li>Enable logging rotation to prevent the logs folder from growing too large.</li>
+    <li>Set up a cron job to automatically check for updates and patch scripts.</li>
+    <li>Consider adding retry logic for network failures in the worker script.</li>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body class="glow-green">
+
+  <div class="site-wrapper">
+    <header class="site-header">
+<div class="header-inner">
+  <!-- Internal links -->
+  <nav class="nav-internal">
+    <a href="/">Home</a>
+    <a href="/projects/">Projects</a>
+    <a href="/tutorials/">Tutorials</a>
+    <a href="/games/">Games</a>
+    <a href="/portfolio/">Portfolio</a>
+    <a href="/about/">About</a>
+  </nav>
+
+  <!-- External/subdomain links -->
+  <nav class="nav-external">
+    <a href="https://tools.kervian.com">Tools</a>
+    <a href="https://docs.kervian.com">Docs</a>
+    <a href="https://countdown.kervian.com">Countdowns</a>
+    <a href="https://status.kervian.com">Status</a>
+  </nav>
+
+  <!-- Hamburger button -->
+  <button class="hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</div>
+
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu">
+    <nav>
+      <a href="/">Home</a>
+      <a href="/projects/">Projects</a>
+      <a href="/tutorials/">Tutorials</a>
+      <a href="/games/">Games</a>
+      <a href="/portfolio/">Portfolio</a>
+      <a href="/about/">About</a>
+      <a href="https://tools.kervian.com">Tools</a>
+      <a href="https://docs.kervian.com">Docs</a>
+      <a href="https://countdown.kervian.com">Countdowns</a>
+      <a href="https://status.kervian.com">Status</a>
+    </nav>
+  </div>
+</header>
+
+    
+
+
+    <main class="site-main">
+      <section class="home-hero">
+  <img src="https://assets.kervian.com/img/logo.jpeg" alt="Kervian Logo" class="logo-home">
+  <h1>Welcome to Bennett's Website</h1>
+  <p class="home-tagline">Full-stack experiments, games, and things I build for fun.</p>
+</section>
+<section class="home-section">
+  <h2>Featured Projects</h2>
+  <div class="card-rail">
+<p><div class="card">
+<a href="/projects/balloon-b-retelling/">
+<h2>The Balloon Bunch Retelling</h2>
+<p>I retold the story of the balloon bunch in stop motion and it is not great</p>
+</a>
+</div></p>
+<p><div class="card">
+<a href="/projects/balloon-bunch/">
+<h2>Project Balloon Bunch</h2>
+<p>This project tells how we launched a fleet of balloons into the sky with a payload.</p>
+</a>
+</div></p>
+<p><div class="card">
+<a href="/projects/birds/">
+<h2>Bird Study</h2>
+<p>I studied a book about birds for just over a second and found my least favirote bird, a vulture.</p>
+</a>
+</div></p>
+  </div>
+  <p class="home-section__link"><a href="/projects/">See all projects →</a></p>
+</section>
+<p>This is the hub of my empire
+Great!!!</p>
+
+    </main>
+
+    <footer class="site-footer">
+  <nav class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/projects/">Projects</a>
+    <a href="/tutorials/">Tutorials</a>
+  </nav>
+
+  <p class="footer-links">
+    <a href="https://github.com/Raylu42x">GitHub</a>
+    ·
+    <a href="mailto:info@kervian.com">info@kervian.com</a>
+  </p>
+
+  <p class="footer-license">
+    © 2026 Bennett. Licensed under
+    <a
+      href="https://creativecommons.org/licenses/by-nc/4.0/"
+      target="_blank"
+      rel="license noopener"
+    >
+      CC BY-NC 4.0
+    </a>
+  </p>
+</footer>
+
+  </div>
+
+  <script>
+    // Hamburger menu toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const hamburger = document.querySelector(".hamburger");
+      const mobileMenu = document.querySelector(".mobile-menu");
+
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener("click", () => {
+          hamburger.classList.toggle("active");
+          mobileMenu.classList.toggle("active");
+        });
+      }
+    });
+  </script>
+<body class="glow-green">
+
+</html>

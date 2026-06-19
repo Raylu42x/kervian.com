@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body class="glow-pink">
+
+  <div class="site-wrapper">
+    <header class="site-header">
+<div class="header-inner">
+  <!-- Internal links -->
+  <nav class="nav-internal">
+    <a href="/">Home</a>
+    <a href="/projects/">Projects</a>
+    <a href="/tutorials/">Tutorials</a>
+    <a href="/games/">Games</a>
+    <a href="/portfolio/">Portfolio</a>
+    <a href="/about/">About</a>
+  </nav>
+
+  <!-- External/subdomain links -->
+  <nav class="nav-external">
+    <a href="https://tools.kervian.com">Tools</a>
+    <a href="https://docs.kervian.com">Docs</a>
+    <a href="https://countdown.kervian.com">Countdowns</a>
+    <a href="https://status.kervian.com">Status</a>
+  </nav>
+
+  <!-- Hamburger button -->
+  <button class="hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</div>
+
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu">
+    <nav>
+      <a href="/">Home</a>
+      <a href="/projects/">Projects</a>
+      <a href="/tutorials/">Tutorials</a>
+      <a href="/games/">Games</a>
+      <a href="/portfolio/">Portfolio</a>
+      <a href="/about/">About</a>
+      <a href="https://tools.kervian.com">Tools</a>
+      <a href="https://docs.kervian.com">Docs</a>
+      <a href="https://countdown.kervian.com">Countdowns</a>
+      <a href="https://status.kervian.com">Status</a>
+    </nav>
+  </div>
+</header>
+
+    
+
+
+    <main class="site-main">
+      <h1>Portfolio</h1>
+<div class="card-grid">
+  <a href="/projects/balloon-bunch/" class="card--portfolio">
+    <h2>Project Balloon Bunch</h2>
+    <p class="card-excerpt">This project tells how we launched a fleet of balloons into the sky with a payload.</p>
+<p><div class="card-content">
+Project Balloon Bunch Our Goal See if there is wifi at 400 ft elevation Get some video footage from up there Drop an egg from at least tree top level And of course have fun Our Plan Use helium balloons to lift a payload Tether the entire thing to the ground Let it gently float the payload up above the trees. Get the goals done Reel in the balloons and payload Launch again to compleatly the next goal Design Complications The “guts” of paracord is too heavy too make the tether we needed so we used...
+</div></p>
+  </a>
+  <a href="/projects/birds/" class="card--portfolio">
+    <h2>Bird Study</h2>
+    <p class="card-excerpt">I studied a book about birds for just over a second and found my least favirote bird, a vulture.</p>
+<p><img src="https://imgs.search.brave.com/EwYF-OGsoFv0He83xXbuehBZ-qPFOGJBNfd44sPWKpQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTQz/ODIxOTM3MS9waG90/by9jbG9zZS11cC1v/Zi12dWx0dXJlLXBl/cmNoaW5nLW9uLWJs/YWNrLWJhY2tncm91/bmQuanBnP3M9NjEy/eDYxMiZ3PTAmaz0y/MCZjPUxIMVJ2NkdS/RkZYQjczczhFWWVu/eHpucng0UkN3Qkc4/QTZUSTdLWXZpNTA9" alt="Bird Study" class="card-image"></p>
+  </a>
+  <a href="/projects/fll-2025-26/" class="card--portfolio">
+    <h2>FLL 2025-26</h2>
+    <p class="card-excerpt">The Robo Cats are a FLL team that made it to the simifinals.</p>
+<p><img src="https://imgs.search.brave.com/RaqjyqHNalUxP7cwEtHf0RLtmwL1Zb1apWuwC-4lVc4/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9iZWJl/YW1vcmRvci5jb20v/d3AtY29udGVudC91/cGxvYWRzLzIwMTkv/MDYvRkxMLWxvZ28u/anBn" alt="FLL 2025-26" class="card-image"></p>
+  </a>
+  <a href="/projects/site/" class="card--portfolio">
+    <h2>Site</h2>
+    <p class="card-excerpt">How</p>
+<p><div class="card-content">
+WHY
+</div></p>
+  </a>
+  <a href="/projects/this-site-s-admin-page/" class="card--portfolio">
+    <h2>This Site&#39;s admin page</h2>
+    <p class="card-excerpt">How the admin page works</p>
+<p><div class="card-content">
+idk
+</div></p>
+  </a>
+</div>
+    </main>
+
+    <footer class="site-footer">
+  <nav class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/projects/">Projects</a>
+    <a href="/tutorials/">Tutorials</a>
+  </nav>
+
+  <p class="footer-links">
+    <a href="https://github.com/Raylu42x">GitHub</a>
+    ·
+    <a href="mailto:info@kervian.com">info@kervian.com</a>
+  </p>
+
+  <p class="footer-license">
+    © 2026 Bennett. Licensed under
+    <a
+      href="https://creativecommons.org/licenses/by-nc/4.0/"
+      target="_blank"
+      rel="license noopener"
+    >
+      CC BY-NC 4.0
+    </a>
+  </p>
+</footer>
+
+  </div>
+
+  <script>
+    // Hamburger menu toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const hamburger = document.querySelector(".hamburger");
+      const mobileMenu = document.querySelector(".mobile-menu");
+
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener("click", () => {
+          hamburger.classList.toggle("active");
+          mobileMenu.classList.toggle("active");
+        });
+      }
+    });
+  </script>
+<body class="glow-pink">
+
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<style>
+body{margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#111;color:white;font-family:sans-serif}
+canvas{border:3px solid #0f0;margin:10px;touch-action:none}
+.buttons{display:grid;grid-template-columns:repeat(3,60px);gap:5px}
+button{height:60px;width:60px;font-size:20px;border-radius:10px;border:none;background:#333;color:#0f0}
+#score,#highscore{font-size:24px;margin:5px}
+.toggle{margin:10px}
+</style>
+</head>
+<body>
+
+<div id="score">Score: 0</div>
+<div id="highscore">High Score: 0</div>
+
+<label class="toggle">
+<input type="checkbox" id="infinite"> Infinite Mode
+</label>
+
+<canvas id="c" width="300" height="300"></canvas>
+
+<div>
+<button id="pause">⏸</button>
+<button id="restart">🔄</button>
+</div>
+
+<div class="buttons">
+<div></div><button id="up">▲</button><div></div>
+<button id="left">◀</button>
+<button id="down">▼</button>
+<button id="right">▶</button>
+</div>
+
+<script>
+const ctx=c.getContext("2d");
+const size=15,cells=20;
+
+let x=10,y=10,dx=1,dy=0;
+let trail=[[x,y]],len=5;
+let fx=5,fy=5;
+let score=0,alive=true,paused=false;
+
+let infinite=localStorage.getItem("snakeInfinite");
+if(infinite===null) infinite=true;
+else infinite=infinite==="true";
+document.getElementById("infinite").checked=infinite;
+
+let highScore=localStorage.getItem("snakeHighScore")||0;
+highscore.textContent="High Score: "+highScore;
+
+infiniteEl=document.getElementById("infinite");
+infiniteEl.onchange=e=>{
+ infinite=e.target.checked;
+ localStorage.setItem("snakeInfinite",infinite);
+};
+
+function gameOver(){
+ alive=false;
+ if(score>highScore){
+  highScore=score;
+  localStorage.setItem("snakeHighScore",highScore);
+  alert("Game Over! New High Score: "+score);
+ }else alert("Game Over! Score: "+score);
+}
+
+function draw(){
+ if(!alive||paused)return;
+
+ x+=dx;y+=dy;
+
+ if(infinite){
+  x=(x+cells)%cells;
+  y=(y+cells)%cells;
+ }else if(x<0||x>=cells||y<0||y>=cells){
+  gameOver();return;
+ }
+
+ for(const p of trail)
+  if(p[0]===x&&p[1]===y){gameOver();return;}
+
+ trail.push([x,y]);
+
+ if(x===fx&&y===fy){
+  len++;score++;
+  document.getElementById("score").textContent="Score: "+score;
+  fx=Math.floor(Math.random()*cells);
+  fy=Math.floor(Math.random()*cells);
+ }
+
+ while(trail.length>len)trail.shift();
+
+ ctx.fillStyle="black";
+ ctx.fillRect(0,0,300,300);
+
+ ctx.fillStyle="lime";
+ trail.forEach(p=>ctx.fillRect(p[0]*size,p[1]*size,size-1,size-1));
+
+ ctx.fillStyle="red";
+ ctx.fillRect(fx*size,fy*size,size-1,size-1);
+}
+
+setInterval(draw,100);
+
+function turn(nx,ny){
+ if(nx===-dx&&ny===-dy)return;
+ dx=nx;dy=ny;
+}
+
+up.onclick=()=>turn(0,-1);
+down.onclick=()=>turn(0,1);
+left.onclick=()=>turn(-1,0);
+right.onclick=()=>turn(1,0);
+
+pause.onclick=()=>{
+ paused=!paused;
+ pause.textContent=paused?"▶":"⏸";
+};
+
+restart.onclick=()=>location.reload();
+
+document.addEventListener("keydown",e=>{
+ let k=e.key.toLowerCase();
+
+ if(k==="p"){
+  paused=!paused;
+  pause.textContent=paused?"▶":"⏸";
+ }
+
+ if(k==="arrowup"||k==="w")turn(0,-1);
+ if(k==="arrowdown"||k==="s")turn(0,1);
+ if(k==="arrowleft"||k==="a")turn(-1,0);
+ if(k==="arrowright"||k==="d")turn(1,0);
+});
+
+let sx,sy;
+c.addEventListener("touchstart",e=>{
+ sx=e.touches[0].clientX;
+ sy=e.touches[0].clientY;
+});
+
+c.addEventListener("touchend",e=>{
+ let ax=e.changedTouches[0].clientX-sx;
+ let ay=e.changedTouches[0].clientY-sy;
+
+ if(Math.abs(ax)>Math.abs(ay))
+  turn(ax>0?1:-1,0);
+ else
+  turn(0,ay>0?1:-1);
+});
+</script>
+
+</body>
+</html>

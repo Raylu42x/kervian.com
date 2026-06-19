@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Save The Past - Prototype</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 1rem;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #222;
+    }
+    .top-links {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .top-links a {
+      text-decoration: none;
+      color: #0077cc;
+      font-weight: bold;
+      margin: 0 0.5rem;
+    }
+    .top-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Our Prototype</h1>
+
+<h2>What It Does</h2>
+<p>Our prototype automatically transfers files from <strong>any USB device</strong> to the cloud. All you need to do is:</p>
+<ol>
+  <li>Plug in a drive</li>
+  <li>Wait</li>
+  <li>Unplug the drive</li>
+</ol>
+<p>Once finished, the files are securely stored in your chosen cloud provider. This allows archaeologists and researchers to preserve valuable records from old storage media without manual effort.</p>
+
+<h3>Key Features:</h3>
+<ul>
+  <li>Fully automated — no human input required</li>
+  <li>Low cost — under $30 to build</li>
+  <li>Adds a <code>.notes.txt</code> file with the drive structure and file tree</li>
+  <li>Compatible with over 70 cloud storage providers</li>
+  <li>Works with any storage device, provided you have the right adapter</li>
+</ul>
+
+<h3>How It Works Behind the Scenes:</h3>
+<ol>
+  <li>Uses <code>udev</code> rules to detect when a drive is plugged in</li>
+  <li>Transfers files to cloud if internet is available; if not, saves locally until reconnected</li>
+  <li>Generates a <code>.notes.txt</code> file documenting the drive’s file structure</li>
+  <li>Ensures all files are uploaded to the cloud once connectivity is restored</li>
+  <li>Handles multiple drives sequentially and avoids overwriting existing files</li>
+</ol>
+
+<h3>Technical Notes:</h3>
+<ul>
+  <li>Written in Python and Bash scripts running on a Raspberry Pi</li>
+  <li>Monitors connected drives in real time</li>
+  <li>Compatible with FAT32, NTFS, and exFAT file systems</li>
+  <li>Logs all activity to a local log file for troubleshooting</li>
+</ul>
+
+<h3>Why It Matters:</h3>
+<p>Many historical and archaeological records exist on <strong>old media that are failing</strong>. Our prototype ensures that this data can be <strong>rescued and preserved digitally</strong>, reducing the risk of permanent loss. By automating the process, we save time and reduce human error.</p>
+
+<h2>What You Need to Make It</h2>
+<p>You can find all materials and instructions <a href="setup.html">here</a>. </p>
+
+
+<footer class="bottom-nav">
+  <a href="https://savethepast.kervian.com/" class="nav-link">Home</a>
+  <a href="https://savethepast.kervian.com/process" class="nav-link">Process</a>
+  <a href="https://savethepast.kervian.com/team" class="nav-link">Team</a>
+</footer>
+
+<style>
+  .bottom-nav {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background: #f5f5f5;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-family: Arial, sans-serif;
+  }
+  .bottom-nav .nav-link {
+    text-decoration: none;
+    color: #444;
+    font-weight: 600;
+  }
+  .bottom-nav .nav-link:hover {
+    text-decoration: underline;
+  }
+  @media (max-width: 600px) {
+    .bottom-nav {
+      flex-direction: column;
+      gap: 0.75rem;
+      text-align: center;
+    }
+  }
+</style>
+</body>
+</html>
