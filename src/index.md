@@ -6,7 +6,7 @@ bodyClass: glow-green
 
 <section class="home-hero">
   <img src="https://assets.kervian.com/img/logo.jpeg" alt="Kervian Logo" class="logo-home">
-  <h1>Welcome to Bennett's Website</h1>
+  <h1>Welcome to one of Bennett's Website</h1>
   <p class="home-tagline">Full-stack experiments, games, and things I build for fun.</p>
 </section>
 
