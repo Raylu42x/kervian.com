@@ -57,6 +57,19 @@
 </header>
 
     
+<div class="site-banner" id="site-banner">
+  <div class="site-banner__content"><p>This site is still a work in progress</p>
+</div>
+  
+  <button class="site-banner__close" aria-label="Dismiss banner" onclick="document.getElementById('site-banner').style.display='none';sessionStorage.setItem('bannerDismissed','1');">&#x2715;</button>
+  
+</div>
+<script>
+  if (sessionStorage.getItem('bannerDismissed')) {
+    document.getElementById('site-banner').style.display = 'none';
+  }
+</script>
+
 
 
     <main class="site-main">
@@ -69,15 +82,15 @@
     </a>
   </div>
   <div class="card">
-    <a href="/projects/balloon-bunch/">
-      <h2>Project Balloon Bunch</h2>
-      <p>This project tells how we launched a fleet of balloons into the sky with a payload.</p>
-    </a>
-  </div>
-  <div class="card">
     <a href="/projects/birds/">
       <h2>Bird Study</h2>
       <p>I studied a book about birds for just over a second and found my least favirote bird, a vulture.</p>
+    </a>
+  </div>
+  <div class="card">
+    <a href="/projects/balloon-bunch/">
+      <h2>Project Balloon Bunch</h2>
+      <p>This project tells how we launched a fleet of balloons into the sky with a payload.</p>
     </a>
   </div>
   <div class="card">
