@@ -4,8 +4,10 @@ title: Countdown
 tags:
   - portfolio
   - projects
+excerpt: 'A countdown for every moment. '
+bodyClass: glow-purple
 ---
-# Every Moment Counted Beatily 
+# Every Moment Counted Beautifully 
 [Link to the countdowns](https://countdown.kervian.com)
 
 Countdown is a living calendar of the moments worth waiting for. Every holiday gets its own full-screen timer and its own animated canvas — fireworks on New Year's, snowfall at Christmas, lanterns rising for the Lunar New Year.
