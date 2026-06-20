@@ -9,4 +9,4 @@ I am a HUMAN
 
 ## Bye
 go find a new page to look at
-like this one: https://kervian.com/projects
+like this one here: https://kervian.com/projects
