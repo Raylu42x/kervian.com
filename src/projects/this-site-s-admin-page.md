@@ -9,5 +9,4 @@ excerpt: How the admin page works
 bodyClass: glow-purple
 portfolioImage: ''
 ---
-
-idk
+A self made cms 'app'
