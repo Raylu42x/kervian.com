@@ -37,6 +37,9 @@ module.exports = function(eleventyConfig) {
   // Passthrough copy for FLL 2025-26 site archive
   eleventyConfig.addPassthroughCopy({"src/projects/fll-2025-26/site": "projects/fll-2025-26/site"});
 
+  // Passthrough copy for Balloon Bunch site archive
+  eleventyConfig.addPassthroughCopy({"src/projects/balloon-bunch/site": "projects/balloon-bunch/site"});
+
   return {
     dir: {
       input: "src",        // your source files
