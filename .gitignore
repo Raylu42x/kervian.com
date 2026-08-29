@@ -1,0 +1,8 @@
+# Dependencies — restored with `npm install`, never committed
+node_modules/
+
+# macOS
+.DS_Store
+
+# Eleventy cache
+.cache/
