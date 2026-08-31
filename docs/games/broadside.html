@@ -1,0 +1,852 @@
+<title>Broadside</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Committed single-theme: night gunnery chart. Painted explicitly so it holds on any host ground. */
+  :root {
+    --sea: #0B1B24;
+    --panel: #10242F;
+    --chart: #1D3A48;
+    --chart-dim: #152C38;
+    --ink: #D8E4E8;
+    --ink-dim: #7E97A2;
+    --brass: #D9A441;
+    --signal: #E4593F;
+    --flash: #F2E9D8;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--sea);
+    color: var(--ink);
+    font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+  }
+  .wrap {
+    max-width: 440px; margin: 0 auto;
+    height: 100dvh;
+    padding: 8px 10px 10px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  header { display: flex; align-items: baseline; justify-content: space-between; flex: none; }
+  h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+  .sub { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
+  .ships { display: flex; gap: 6px; flex: none; }
+  .card { flex: 1; background: var(--panel); border: 1px solid var(--chart); padding: 4px 8px 6px; }
+  .card .name { font-size: 11.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; }
+  .card.you .name { color: var(--brass); }
+  .card.foe .name { color: var(--signal); }
+  .bar { display: flex; align-items: center; gap: 5px; margin-top: 3px; }
+  .bar .lb { width: 30px; font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
+  .bar .track { flex: 1; height: 4px; background: rgba(0,0,0,0.45); }
+  .bar .fill { height: 100%; }
+  .you .fill { background: var(--brass); }
+  .foe .fill { background: var(--signal); }
+  #boardBox { flex: 1 1 auto; min-height: 0; position: relative; }
+  #sea { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border: 1px solid var(--chart); background: var(--sea); }
+  .hint { flex: none; font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--brass); min-height: 1.3em; text-align: center; }
+  .orders { display: flex; flex-direction: column; gap: 4px; flex: none; }
+  .orow { display: flex; gap: 4px; align-items: stretch; }
+  .orow .lbl { width: 40px; display: flex; align-items: center; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
+  .seg { flex: 1; display: flex; gap: 3px; }
+  .seg button {
+    flex: 1; font-family: "Barlow Condensed", sans-serif;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 8px 0; border: 1px solid var(--chart);
+    background: transparent; color: var(--ink-dim); cursor: pointer;
+  }
+  .seg button.on { border-color: var(--brass); color: var(--brass); background: rgba(217,164,65,0.10); }
+  .seg button:disabled { opacity: 0.3; }
+  .seg button:focus-visible { outline: 2px solid var(--flash); outline-offset: 1px; }
+  .execrow { display: flex; gap: 5px; flex: none; }
+  .execrow button { font-family: "Barlow Condensed", sans-serif; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
+  #exec { flex: 2.6; font-size: 16px; padding: 11px 0; border: 1px solid var(--brass); background: var(--brass); color: var(--sea); }
+  #exec:disabled { opacity: 0.4; }
+  #restart { flex: 1; font-size: 13px; border: 1px solid var(--chart); background: transparent; color: var(--ink-dim); }
+  .log {
+    flex: none; background: var(--panel); border: 1px solid var(--chart);
+    padding: 5px 9px; font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; line-height: 1.5; color: var(--ink-dim);
+    height: 58px; overflow-y: auto;
+  }
+  .log .you { color: var(--brass); }
+  .log .foe { color: var(--signal); }
+  .log .big { color: var(--flash); }
+  .log .turnhead { color: var(--ink); }
+  .banner {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+    background: rgba(11,27,36,0.93); text-align: center; padding: 26px; z-index: 10;
+  }
+  .banner.show { display: flex; }
+  .banner h2 { margin: 0; font-size: 38px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .banner p { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; line-height: 1.6; color: var(--ink); margin: 0; max-width: 340px; text-align: left; white-space: pre-line; }
+  .banner button {
+    font-family: "Barlow Condensed", sans-serif; font-size: 16px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; padding: 12px 38px;
+    border: 1px solid var(--brass); background: transparent; color: var(--brass); cursor: pointer;
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Broadside</h1>
+    <div class="sub" id="turnLabel">Turn 1</div>
+  </header>
+
+  <div class="ships">
+    <div class="card you">
+      <div class="name">Alacrity · sloop</div>
+      <div class="bar"><span class="lb">Hull</span><div class="track"><div class="fill" id="pHull"></div></div></div>
+      <div class="bar"><span class="lb">Rig</span><div class="track"><div class="fill" id="pRig"></div></div></div>
+      <div class="bar"><span class="lb">Crew</span><div class="track"><div class="fill" id="pCrew"></div></div></div>
+    </div>
+    <div class="card foe">
+      <div class="name">San Cristóbal</div>
+      <div class="bar"><span class="lb">Hull</span><div class="track"><div class="fill" id="eHull"></div></div></div>
+      <div class="bar"><span class="lb">Rig</span><div class="track"><div class="fill" id="eRig"></div></div></div>
+      <div class="bar"><span class="lb">Crew</span><div class="track"><div class="fill" id="eCrew"></div></div></div>
+    </div>
+  </div>
+
+  <div id="boardBox"><canvas id="sea"></canvas></div>
+  <div class="hint" id="hint"></div>
+
+  <div class="orders" id="ordersNormal">
+    <div class="orow"><span class="lbl">Helm</span>
+      <div class="seg" id="segHelm">
+        <button data-v="-2">⟲⟲</button><button data-v="-1">⟲</button><button data-v="0" class="on">—</button><button data-v="1">⟳</button><button data-v="2">⟳⟳</button>
+      </div>
+    </div>
+    <div class="orow"><span class="lbl">Sails</span>
+      <div class="seg" id="segSails">
+        <button data-v="full">Full</button><button data-v="battle" class="on">Battle</button><button data-v="takein">Take in</button>
+      </div>
+    </div>
+    <div class="orow"><span class="lbl">Guns</span>
+      <div class="seg" id="segShot">
+        <button data-v="round" class="on">Round 3</button><button data-v="chain">Chain 2</button><button data-v="grape">Grape 1</button><button data-v="double">Dbl 1</button><button data-v="hold">Hold</button>
+      </div>
+    </div>
+    <div class="orow"><span class="lbl">Close</span>
+      <div class="seg" id="segGrap">
+        <button data-v="no" class="on">Stand off</button><button data-v="yes" id="grapBtn">Grapple &amp; board</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="orders" id="ordersBoarding" style="display:none">
+    <div class="orow"><span class="lbl">Melee</span>
+      <div class="seg" id="segMelee">
+        <button data-v="press" class="on">Press!</button><button data-v="holdm">Hold</button><button data-v="back">Fall back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="execrow">
+    <button id="exec">Make it so</button>
+    <button id="restart">Restart</button>
+  </div>
+
+  <div class="log" id="log"></div>
+</div>
+
+<div class="banner show" id="banner">
+  <h2 id="bTitle" style="color:var(--brass)">Broadside</h2>
+  <p id="bText">Windward Passage, 1701. Your Bermuda sloop ALACRITY, 8 guns and a hungry crew, has been shadowing a Spanish guarda costa since dawn. She is bigger, square-rigged, and holds the weather gage — but you point closer to the wind than she ever will.
+
+Each turn, set your orders — helm, sails, guns. Both ships commit blind, then the sea decides. Battle sail fights; full sail flies, but sends the gun crews aloft and silences your battery. Port and starboard batteries load and fire separately — a broadside takes a turn to reload, and your guns fire as she bears. The bright strake on your hull shows which battery stands ready.
+
+Cripple her rigging, bleed her crew, and take her whole… or be taken.</p>
+  <button id="bBtn">Take command</button>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const COLS = 9, ROWS = 10;
+  const DIRS = [{q:0,r:-1},{q:1,r:-1},{q:1,r:0},{q:0,r:1},{q:-1,r:1},{q:-1,r:0}]; // N NE SE S SW NW
+  const DIRNAMES = ['N','NE','SE','S','SW','NW'];
+  const ATT_NAMES = ['In irons','Close-hauled','Reaching','Running'];
+  const CENTER = { q: 4, r: 2 }; // offset (4,4)
+  const cv = document.getElementById('sea');
+  const cx = cv.getContext('2d');
+  const box = document.getElementById('boardBox');
+  const css = getComputedStyle(document.documentElement);
+  const C = n => css.getPropertyValue(n).trim();
+  const rnd = () => Math.random();
+  const SQ3 = Math.sqrt(3);
+
+  let S = 0, dpr = 1, offX = 0, offY = 0, W = 0, H = 0;
+  function sizeCanvas() {
+    W = box.clientWidth; H = box.clientHeight;
+    S = Math.min(W / (1.5 * COLS + 0.7), H / (SQ3 * (ROWS + 0.7)));
+    const bw = S * (1.5 * COLS + 0.5), bh = S * SQ3 * (ROWS + 0.5);
+    offX = (W - bw) / 2 + S; offY = (H - bh) / 2 + S * 0.9;
+    dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const px = (q, r) => ({
+    x: S * 1.5 * q + offX,
+    y: S * SQ3 * ((r + (q - (q & 1)) / 2) + (q & 1 ? 0.5 : 0)) + offY
+  });
+  const inBounds = (q, r) => {
+    const col = q, row = r + (q - (q & 1)) / 2;
+    return col >= 0 && col < COLS && row >= 0 && row < ROWS;
+  };
+  const hexDist = (a, b) => {
+    const dq = a.q - b.q, dr = a.r - b.r;
+    return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+  };
+  const dirBetween = (a, b) => {
+    const A = px(a.q, a.r), B = px(b.q, b.r);
+    const ang = Math.atan2(B.y - A.y, B.x - A.x) * 180 / Math.PI;
+    return (Math.round((ang + 90) / 60) % 6 + 6) % 6;
+  };
+  const angleOf = f => (-90 + 60 * f) * Math.PI / 180;
+  const attOf = (facing, windFrom) => {
+    const d = Math.abs(facing - windFrom);
+    return Math.min(d, 6 - d);
+  };
+
+  // ---------- fx state ----------
+  const fx = { shipPos: {}, tracer: null, flashes: [], floaters: [], shake: 0, muzzle: null, pan: { x: 0, y: 0 } };
+  const now = () => performance.now();
+  function tween(ms, fn) {
+    return new Promise(res => {
+      const t0 = now();
+      (function step() {
+        const k = Math.min(1, (now() - t0) / ms);
+        fn(k); draw();
+        if (k < 1) requestAnimationFrame(step); else res();
+      })();
+    });
+  }
+  const sleepDraw = ms => tween(ms, () => {});
+  function addFlash(x, y, color, big) { fx.flashes.push({ x, y, color, big, t0: now(), life: big ? 480 : 340 }); }
+  function addFloater(x, y, text, color) {
+    fx.floaters.push({ x, y: y - S * 0.3, text, color, t0: now(), life: 950 });
+  }
+
+  // ---------- state ----------
+  let you, foe, turn, windFrom, over, grappled, busy = false;
+  const orders = { helm: 0, sails: 'battle', shot: 'round', grapple: 'no', melee: 'press' };
+
+  function makeShips() {
+    you = { q: 4, r: 5, facing: 1, rig: 'fa', speeds: [0,2,3,1], turnMax: 2, tackOdds: 0.8,
+      hull: 8, hullMax: 8, rigging: 8, rigMax: 8, crew: 12, crewMax: 12, quality: 1.15,
+      sails: 'battle', guns: { port: 0, stbd: 0 }, rudderJam: 0, inIrons: false, name: 'Alacrity', isYou: true };
+    foe = { q: 4, r: -1, facing: 3, rig: 'sq', speeds: [0,1,3,2], turnMax: 1, tackOdds: 0.5,
+      hull: 12, hullMax: 12, rigging: 10, rigMax: 10, crew: 10, crewMax: 10, quality: 1.0,
+      sails: 'battle', guns: { port: 0, stbd: 0 }, rudderJam: 0, inIrons: false, name: 'San Cristóbal', isYou: false };
+  }
+
+  function reset() {
+    makeShips();
+    turn = 1; windFrom = 0; over = false; grappled = false; busy = false;
+    orders.helm = 0; orders.sails = 'battle'; orders.shot = 'round'; orders.grapple = 'no'; orders.melee = 'press';
+    fx.shipPos = {}; fx.tracer = null; fx.flashes = []; fx.floaters = []; fx.shake = 0; fx.muzzle = null; fx.pan = { x: 0, y: 0 };
+    logEl.innerHTML = '';
+    log('Dawn. She is upwind, bearing down under battle sail.', 'foe');
+    log('Set your orders, Captain, then MAKE IT SO.');
+    syncSegs(); syncHud(); syncOrdersUI(); draw(); updateHint();
+    document.getElementById('banner').classList.remove('show');
+  }
+
+  // ---------- logging / hud ----------
+  const logEl = document.getElementById('log');
+  function log(msg, cls) {
+    const d = document.createElement('div');
+    if (cls) d.className = cls;
+    d.textContent = msg;
+    logEl.appendChild(d);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function bar(id, v, m) { document.getElementById(id).style.width = Math.max(0, 100 * v / m) + '%'; }
+  function syncHud() {
+    bar('pHull', you.hull, you.hullMax); bar('pRig', you.rigging, you.rigMax); bar('pCrew', you.crew, you.crewMax);
+    bar('eHull', foe.hull, foe.hullMax); bar('eRig', foe.rigging, foe.rigMax); bar('eCrew', foe.crew, foe.crewMax);
+    document.getElementById('turnLabel').textContent = 'Turn ' + turn + ' · Wind fr. ' + DIRNAMES[windFrom];
+  }
+  function updateHint() {
+    if (over) return;
+    if (grappled) { document.getElementById('hint').textContent = 'Grappled! Steel decides now.'; return; }
+    const att = attOf(simFacing(you, orders.helm), windFrom);
+    const spd = att === 0 ? 0 : speedOf(you, att, orders.sails);
+    const sideTxt = side => you.guns[side] === 0 ? '✓' : you.guns[side];
+    const gun = orders.sails === 'full' ? 'guns silent — full sail'
+      : 'P ' + sideTxt('port') + ' · S ' + sideTxt('stbd') + (orders.shot === 'hold' ? ' · held' : ' · ' + orders.shot);
+    document.getElementById('hint').textContent =
+      ATT_NAMES[att] + ' → ' + spd + ' hex' + (spd === 1 ? '' : 'es') + ' · range ' + hexDist(you, foe) + ' · ' + gun;
+  }
+
+  // ---------- mechanics ----------
+  function speedOf(s, att, sails) {
+    let v = s.speeds[att];
+    if (sails === 'full' && v > 0) v += 1;
+    if (sails === 'takein') v = Math.min(v, 1);
+    const frac = s.rigging / s.rigMax;
+    if (frac <= 0) return 0;
+    return Math.ceil(v * frac);
+  }
+  function simFacing(s, helm) {
+    let f = s.facing;
+    const step = Math.sign(helm);
+    for (let i = 0; i < Math.abs(helm); i++) f = (f + step + 6) % 6;
+    return f;
+  }
+  function applyHelm(s, helm) {
+    if (s.rudderJam > 0) {
+      if (helm !== 0) log(s.name + ' — rudder fouled, she will not answer the helm!', s.isYou ? 'you' : 'foe');
+      return;
+    }
+    if (s.inIrons) helm = Math.max(-1, Math.min(1, helm));
+    const step = Math.sign(helm);
+    for (let i = 0; i < Math.abs(helm); i++) {
+      const next = (s.facing + step + 6) % 6;
+      if (next === windFrom) {
+        if (rnd() < s.tackOdds) {
+          s.facing = next; s.inIrons = false;
+          log(s.name + ' tacks through the eye of the wind — smartly done.', s.isYou ? 'you' : 'foe');
+        } else {
+          s.facing = next; s.inIrons = true;
+          log(s.name + ' misses stays — caught in irons!', 'big');
+          return;
+        }
+      } else {
+        s.facing = next;
+        if (s.facing !== windFrom) s.inIrons = false;
+      }
+    }
+    if (attOf(s.facing, windFrom) === 0) s.inIrons = true;
+  }
+  function pathOf(s, other) {
+    const att = attOf(s.facing, windFrom);
+    const v = s.inIrons || att === 0 ? 0 : speedOf(s, att, s.sails);
+    const cells = [];
+    let cur = { q: s.q, r: s.r };
+    for (let i = 0; i < v; i++) {
+      const d = DIRS[s.facing];
+      const nxt = { q: cur.q + d.q, r: cur.r + d.r };
+      if (!inBounds(nxt.q, nxt.r)) break;
+      if (other && nxt.q === other.q && nxt.r === other.r) break;
+      cells.push(nxt); cur = nxt;
+    }
+    return cells;
+  }
+  function moveShips() {
+    const paths = { [you.name]: [], [foe.name]: [] };
+    if (grappled) return paths;
+    for (const s of [you, foe]) {
+      const other = s === you ? foe : you;
+      if (s.inIrons || s.rigging <= 0) {
+        const dd = DIRS[(windFrom + 3) % 6];
+        const nxt = { q: s.q + dd.q, r: s.r + dd.r };
+        if (inBounds(nxt.q, nxt.r) && !(nxt.q === other.q && nxt.r === other.r)) {
+          paths[s.name].push(nxt); s.q = nxt.q; s.r = nxt.r;
+        }
+        if (s.inIrons) log(s.name + ' hangs in irons, drifting to leeward.', s.isYou ? 'you' : 'foe');
+        continue;
+      }
+      const path = pathOf(s, other);
+      if (path.length) { const end = path[path.length - 1]; paths[s.name] = path; s.q = end.q; s.r = end.r; }
+    }
+    return paths;
+  }
+  // open ocean: shift both ships so the fight stays centered (the sea scrolls, not the ships)
+  function recenter() {
+    const mid = { q: Math.round((you.q + foe.q) / 2), r: Math.round((you.r + foe.r) / 2) };
+    const dq = CENTER.q - mid.q, dr = CENTER.r - mid.r;
+    if (!dq && !dr) return null;
+    if (!inBounds(you.q + dq, you.r + dr) || !inBounds(foe.q + dq, foe.r + dr)) return null;
+    you.q += dq; you.r += dr; foe.q += dq; foe.r += dr;
+    return { x: S * 1.5 * dq, y: S * SQ3 * (dr + dq / 2) };
+  }
+
+  const SHOT = {
+    round:  { range: 3, reload: 1 },
+    chain:  { range: 2, reload: 1 },
+    grape:  { range: 1, reload: 1 },
+    double: { range: 1, reload: 2 },
+  };
+  const anyLoaded = s => s.guns.port === 0 || s.guns.stbd === 0;
+  function fire(s, t, shot, results) {
+    if (!anyLoaded(s) || shot === 'hold') return;
+    if (s.sails === 'full') { results.push({ s, none: true, fullsail: true }); return; }
+    const d = hexDist(s, t);
+    const rel = (dirBetween(s, t) - s.facing + 6) % 6;
+    const side = (rel === 1 || rel === 2) ? 'stbd' : (rel === 4 || rel === 5) ? 'port' : null;
+    if (!side || d > SHOT[shot].range || d === 0) {
+      results.push({ s, none: true, broadside: !!side });
+      return;
+    }
+    if (s.guns[side] !== 0) { results.push({ s, none: true, empty: side }); return; }
+    // +1 because the countdown ticks at the end of THIS turn too: a broadside
+    // fired on turn N is loaded again at the end of N+1 — fire every other turn.
+    s.guns[side] = SHOT[shot].reload + 1 + (s.crew / s.crewMax < 0.5 ? 1 : 0);
+    const trel = (dirBetween(t, s) - t.facing + 6) % 6;
+    const rake = trel === 0 ? 'bow' : (trel === 3 ? 'stern' : null);
+    const mult = rake === 'bow' ? 1.5 : (rake === 'stern' ? 2 : 1);
+    const rangeMod = d >= 3 ? -1 : 0;
+    const r = { s, t, shot, rake, side, hull: 0, rig: 0, crew: 0, rudder: false };
+    if (shot === 'round') {
+      r.hull = Math.max(1, Math.round((2 + Math.floor(rnd() * 3) + rangeMod) * mult));
+      if (rnd() < 0.35) r.crew = 1;
+    } else if (shot === 'chain') {
+      r.rig = Math.max(1, Math.round((2 + Math.floor(rnd() * 2)) * mult));
+      if (t.sails === 'full') r.rig += 1;
+    } else if (shot === 'grape') {
+      r.crew = Math.max(1, Math.round((2 + Math.floor(rnd() * 3)) * mult));
+    } else if (shot === 'double') {
+      r.hull = Math.max(2, Math.round((3 + Math.floor(rnd() * 4)) * mult));
+      if (rnd() < 0.5) r.crew = 1;
+    }
+    if (rake === 'stern' && rnd() < 0.35) r.rudder = true;
+    results.push(r);
+  }
+  function applyFireResult(r) {
+    const who = r.s.isYou ? 'you' : 'foe';
+    if (r.none) {
+      if (r.fullsail) { if (r.s.isYou) log('Gun crews are aloft — under full sail the guns stay silent.', 'you'); }
+      else if (r.empty) { if (r.s.isYou) log('She bears to ' + (r.empty === 'port' ? 'port' : 'starboard') + ' — but that battery is empty.', 'you'); }
+      else if (r.s.isYou) log('Your guns find no bearing' + (r.broadside ? ' at this range.' : ' — she lies off your arcs.'), 'you');
+      return;
+    }
+    const t = r.t;
+    t.hull = Math.max(0, t.hull - r.hull);
+    t.rigging = Math.max(0, t.rigging - r.rig);
+    t.crew = Math.max(0, t.crew - r.crew);
+    if (r.rudder) t.rudderJam = 2;
+    const bits = [];
+    if (r.hull) bits.push(r.hull + ' hull');
+    if (r.rig) bits.push(r.rig + ' rigging');
+    if (r.crew) bits.push(r.crew + ' crew');
+    log(r.s.name + ' fires her ' + (r.side === 'port' ? 'port' : 'starboard') + ' battery — ' + r.shot + (r.rake ? ', RAKING her ' + r.rake + '!' : '') + ' (' + bits.join(', ') + ')', r.rake ? 'big' : who);
+    if (r.rudder) log(t.name + '’s rudder is shot away — she cannot steer!', 'big');
+    if (t.rigging === 0 && r.rig) log(t.name + ' is dismasted! She drifts helpless.', 'big');
+  }
+  async function animateShot(r) {
+    if (r.none) { applyFireResult(r); return; }
+    const A = px(r.s.q, r.s.r), B = px(r.t.q, r.t.r);
+    fx.muzzle = { x: A.x, y: A.y, tx: B.x, ty: B.y, t0: now(), life: 200 };
+    await sleepDraw(140);
+    await tween(240, k => { fx.tracer = { x1: A.x, y1: A.y, x2: B.x, y2: B.y, k }; });
+    fx.tracer = null; fx.muzzle = null;
+    applyFireResult(r);
+    const color = r.crew && !r.hull ? C('--signal') : C('--flash');
+    addFlash(B.x, B.y, color, !!r.rake || r.shot === 'double');
+    if (r.rake || r.shot === 'double') fx.shake = 1;
+    let dy = 0;
+    if (r.hull) { addFloater(B.x, B.y + dy, '−' + r.hull + ' HULL', C('--flash')); dy += 14; }
+    if (r.rig)  { addFloater(B.x, B.y + dy, '−' + r.rig + ' RIG', C('--brass')); dy += 14; }
+    if (r.crew) { addFloater(B.x, B.y + dy, '−' + r.crew + ' CREW', C('--signal')); dy += 14; }
+    if (r.rake) addFloater(B.x, B.y - S * 0.9, 'RAKED — ' + r.rake.toUpperCase() + '!', C('--flash'));
+    syncHud();
+    await sleepDraw(420);
+  }
+
+  function tryGrapple() {
+    if (grappled || over) return;
+    const wantYou = orders.grapple === 'yes';
+    const foeWants = foe.crew > you.crew * 1.2 && foe.crew / foe.crewMax > 0.5;
+    if (!wantYou && !foeWants) return;
+    if (hexDist(you, foe) !== 1) {
+      if (wantYou) log('No grapple — she is beyond the throw of a hook.', 'you');
+      return;
+    }
+    const tgt = wantYou ? foe : you;
+    const tgtSlow = tgt.inIrons || tgt.rigging / tgt.rigMax <= 0.4 || speedOf(tgt, attOf(tgt.facing, windFrom), tgt.sails) <= 1;
+    if (rnd() < (tgtSlow ? 0.75 : 0.4)) {
+      grappled = true;
+      log('Grappling hooks bite — the hulls are lashed together!', 'big');
+      const A = px(you.q, you.r), B = px(foe.q, foe.r);
+      addFlash((A.x + B.x) / 2, (A.y + B.y) / 2, C('--flash'), true);
+    } else {
+      log((wantYou ? 'Your' : 'Her') + ' hooks fall short — she sheers away.', wantYou ? 'you' : 'foe');
+    }
+  }
+
+  async function boardingRound() {
+    const act = orders.melee;
+    if (act === 'back') {
+      if (rnd() < 0.7) {
+        grappled = false;
+        log('You cut the lines and fend off — the ships part.', 'you');
+        return;
+      }
+      log('The lines hold — you cannot break free!', 'foe');
+    }
+    const pS = you.crew * you.quality * (0.6 + 0.4 * rnd());
+    const eS = foe.crew * foe.quality * (0.6 + 0.4 * rnd());
+    let pLoss, eLoss;
+    if (act === 'press') { eLoss = 2 + (pS > eS ? 2 : 0); pLoss = 1 + (eS > pS ? 2 : 0); }
+    else { eLoss = pS > eS ? 1 : 0; pLoss = eS > pS ? 1 : 0; }
+    foe.crew = Math.max(0, foe.crew - eLoss);
+    you.crew = Math.max(0, you.crew - pLoss);
+    const A = px(you.q, you.r), B = px(foe.q, foe.r);
+    addFlash((A.x + B.x) / 2, (A.y + B.y) / 2, C('--signal'), true);
+    if (eLoss) addFloater(B.x, B.y, '−' + eLoss + ' CREW', C('--signal'));
+    if (pLoss) addFloater(A.x, A.y, '−' + pLoss + ' CREW', C('--brass'));
+    fx.shake = 0.7;
+    log('Melee on the deck — ' + eLoss + ' of hers down, ' + pLoss + ' of yours.', pS > eS ? 'you' : 'foe');
+    syncHud();
+    await sleepDraw(600);
+    if (foe.crew <= 3) win('Her deck is yours. The survivors throw down their arms.');
+    else if (you.crew <= 2) lose('Your boarders are cut down; Spanish steel sweeps the Alacrity’s deck.');
+  }
+
+  function endOfTurn() {
+    if (over) return;
+    for (const s of [you, foe]) {
+      if (s.sails === 'takein' && s.rigging < s.rigMax && rnd() < 0.9) {
+        s.rigging += 1;
+        log(s.name + '’s topmen knot and splice — rigging repaired.', s.isYou ? 'you' : 'foe');
+      }
+      for (const side of ['port', 'stbd']) {
+        if (s.guns[side] > 0) {
+          s.guns[side] -= 1;
+          if (s.guns[side] === 0 && s.isYou) log('Your ' + (side === 'port' ? 'port' : 'starboard') + ' battery is loaded and run out.', 'you');
+        }
+      }
+      if (s.rudderJam > 0) s.rudderJam -= 1;
+    }
+    const hullF = foe.hull / foe.hullMax, crewF = foe.crew / foe.crewMax, rigF = foe.rigging / foe.rigMax;
+    if (foe.hull <= 0) { win('Shattered and settling, the San Cristóbal strikes her colors.'); return; }
+    if ((hullF <= 0.25 || crewF <= 0.25 || (rigF <= 0.15 && hullF <= 0.6)) && rnd() < 0.5) {
+      win('Her captain has seen enough — the Spanish ensign comes fluttering down.');
+      return;
+    }
+    if (you.hull <= 0) { lose('The Alacrity is beaten to a wreck. The sea takes her, and your name with it.'); return; }
+    if (you.crew <= 2) { lose('Too few hands remain to fight the ship. You haul down your colors.'); return; }
+    if (hexDist(you, foe) >= 9) {
+      over = true;
+      const foeWorse = (foe.hull / foe.hullMax + foe.rigging / foe.rigMax) < (you.hull / you.hullMax + you.rigging / you.rigMax);
+      banner('Action Broken Off',
+        foeWorse ? 'Battered and bleeding, the guarda costa shows you her heels. No prize today — but the sea lanes will hear that a sloop of 8 guns drove her off.'
+                 : 'The ships part beyond gunshot. The San Cristóbal holds her course; the Alacrity lives to hunt another day.',
+        C('--ink'));
+      return;
+    }
+    if (turn % 3 === 0 && rnd() < 0.4) {
+      const shift = rnd() < 0.5 ? 1 : -1;
+      windFrom = (windFrom + shift + 6) % 6;
+      log('The wind ' + (shift === 1 ? 'veers' : 'backs') + ' — now from ' + DIRNAMES[windFrom] + '.', 'big');
+      for (const s of [you, foe]) s.inIrons = attOf(s.facing, windFrom) === 0;
+    }
+    turn += 1;
+    log('— Turn ' + turn + ' —', 'turnhead');
+  }
+
+  // ---------- enemy AI ----------
+  function foeOrders() {
+    if (grappled) return { helm: 0, sails: 'battle', shot: you.crew > 4 ? 'grape' : 'round' };
+    let best = null;
+    const wv = { x: Math.cos(angleOf(windFrom)), y: Math.sin(angleOf(windFrom)) };
+    for (const helm of [-1, 0, 1]) {
+      let f = foe.facing;
+      const step = Math.sign(helm);
+      let risky = false;
+      for (let i = 0; i < Math.abs(helm); i++) { f = (f + step + 6) % 6; if (f === windFrom) risky = true; }
+      if (risky) continue;
+      for (const sails of ['battle', 'full']) {
+        const ghost = Object.assign({}, foe, { facing: f, sails, inIrons: attOf(f, windFrom) === 0 });
+        const path = pathOf(ghost, you);
+        const end = path.length ? path[path.length - 1] : { q: foe.q, r: foe.r };
+        const pos = Object.assign({}, ghost, end);
+        const d = hexDist(pos, you);
+        const rel = (dirBetween(pos, you) - f + 6) % 6;
+        const bearSide = (rel === 1 || rel === 2) ? 'stbd' : (rel === 4 || rel === 5) ? 'port' : null;
+        const arc = !!bearSide && foe.guns[bearSide] === 0; // a bearing side with a LOADED battery
+        let score = -Math.abs(d - 1.5) * 2;
+        if (arc && d <= 3) score += 6;
+        if (sails === 'full' && arc && d <= 3) score -= 5; // full sail silences her guns
+        if (attOf(f, windFrom) === 0) score -= 100;
+        const A = px(pos.q, pos.r), B = px(you.q, you.r);
+        score += ((B.x - A.x) * wv.x + (B.y - A.y) * wv.y) * -0.004;
+        score += rnd() * 0.8;
+        if (!best || score > best.score) best = { helm, sails, score, endDist: d };
+      }
+    }
+    if (!best) best = { helm: 0, sails: 'battle', endDist: hexDist(you, foe) };
+    let shot = 'round';
+    if (best.endDist <= 1) shot = you.crew / you.crewMax > 0.45 ? 'grape' : 'double';
+    else if (best.endDist <= 2 && you.rigging / you.rigMax > 0.45 && turn <= 6) shot = 'chain';
+    return { helm: best.helm, sails: best.sails, shot };
+  }
+
+  // ---------- turn execution ----------
+  async function execute() {
+    if (over || busy) return;
+    busy = true;
+    document.getElementById('exec').disabled = true;
+    const eo = foeOrders();
+    if (grappled) {
+      await boardingRound();
+    } else {
+      // open-ocean camera: recenter coordinates now, then pan the chart during the move
+      const shift = recenter();
+      if (shift) fx.pan = { x: -shift.x, y: -shift.y };
+      you.sails = orders.sails; foe.sails = eo.sails;
+      const startYou = px(you.q, you.r), startFoe = px(foe.q, foe.r);
+      applyHelm(you, orders.helm);
+      applyHelm(foe, eo.helm);
+      const paths = moveShips();
+      const wpYou = [startYou].concat(paths[you.name].map(c => px(c.q, c.r)));
+      const wpFoe = [startFoe].concat(paths[foe.name].map(c => px(c.q, c.r)));
+      const lerpPath = (wp, k) => {
+        if (wp.length === 1) return wp[0];
+        const t = k * (wp.length - 1), i = Math.min(wp.length - 2, Math.floor(t)), f = t - i;
+        return { x: wp[i].x + (wp[i+1].x - wp[i].x) * f, y: wp[i].y + (wp[i+1].y - wp[i].y) * f };
+      };
+      const panFrom = { x: fx.pan.x, y: fx.pan.y };
+      await tween(shift ? 640 : 520, k => {
+        const e = 1 - (1 - k) * (1 - k); // ease-out for the camera
+        fx.pan = { x: panFrom.x * (1 - e), y: panFrom.y * (1 - e) };
+        fx.shipPos[you.name] = lerpPath(wpYou, k);
+        fx.shipPos[foe.name] = lerpPath(wpFoe, k);
+      });
+      fx.shipPos = {}; fx.pan = { x: 0, y: 0 };
+      tryGrapple();
+      if (!over) {
+        const results = [];
+        fire(you, foe, orders.shot, results);
+        fire(foe, you, eo.shot, results);
+        for (const r of results) await animateShot(r);
+      }
+    }
+    endOfTurn();
+    await sleepDraw(500); // let floaters finish
+    syncHud(); syncOrdersUI(); draw(); updateHint();
+    busy = false;
+    document.getElementById('exec').disabled = over;
+  }
+
+  function win(text) {
+    over = true;
+    banner('Prize Taken', text + '\n\nA guarda costa of 12 guns, taken by a sloop of 8. They will sing about this in Port Royal — and the prize court will pay for the singing.', C('--brass'));
+  }
+  function lose(text) { over = true; banner('Struck', text, C('--signal')); }
+  function banner(title, text, color) {
+    const b = document.getElementById('banner');
+    document.getElementById('bTitle').textContent = title;
+    document.getElementById('bTitle').style.color = color;
+    document.getElementById('bText').textContent = text;
+    document.getElementById('bBtn').textContent = 'Sail again';
+    b.classList.add('show');
+  }
+
+  // ---------- drawing ----------
+  function hexPath(p) {
+    cx.beginPath();
+    for (let k = 0; k < 6; k++) {
+      const a = Math.PI / 3 * k;
+      const X = p.x + S * Math.cos(a), Y = p.y + S * Math.sin(a);
+      k ? cx.lineTo(X, Y) : cx.moveTo(X, Y);
+    }
+    cx.closePath();
+  }
+  function draw() {
+    cx.save();
+    cx.clearRect(0, 0, W, H);
+    cx.fillStyle = C('--sea'); cx.fillRect(0, 0, W, H);
+    if (fx.shake > 0) {
+      cx.translate((rnd() - 0.5) * 7 * fx.shake, (rnd() - 0.5) * 7 * fx.shake);
+      fx.shake = Math.max(0, fx.shake - 0.06);
+    }
+    cx.save();
+    cx.translate(fx.pan.x, fx.pan.y);
+    cx.strokeStyle = C('--chart-dim'); cx.lineWidth = 1;
+    for (let col = 0; col < COLS; col++) for (let row = 0; row < ROWS; row++) {
+      const q = col, r = row - (col - (col & 1)) / 2;
+      hexPath(px(q, r)); cx.stroke();
+    }
+    if (!over && !grappled && !busy) {
+      const f = simFacing(you, orders.helm);
+      const ghost = Object.assign({}, you, { facing: f, sails: orders.sails, inIrons: attOf(f, windFrom) === 0 });
+      const path = ghost.inIrons ? [] : pathOf(ghost, foe);
+      cx.fillStyle = 'rgba(217,164,65,0.16)';
+      for (const c of path) { hexPath(px(c.q, c.r)); cx.fill(); }
+    }
+    // range line (quiet, informational)
+    if (!over && !grappled && !busy) {
+      const a = px(you.q, you.r), b = px(foe.q, foe.r);
+      cx.strokeStyle = C('--ink-dim'); cx.lineWidth = 1;
+      cx.globalAlpha = 0.5; cx.setLineDash([2, 5]);
+      cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
+      cx.setLineDash([]); cx.globalAlpha = 1;
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      cx.fillStyle = C('--sea');
+      cx.beginPath(); cx.arc(mx, my, 9, 0, Math.PI * 2); cx.fill();
+      cx.strokeStyle = C('--ink-dim'); cx.stroke();
+      cx.fillStyle = C('--ink');
+      cx.font = '600 11px "IBM Plex Mono", monospace';
+      cx.textAlign = 'center'; cx.textBaseline = 'middle';
+      cx.fillText(String(hexDist(you, foe)), mx, my + 0.5);
+      cx.textBaseline = 'alphabetic';
+    }
+    if (grappled) {
+      const a = shipPx(you), b = shipPx(foe);
+      cx.strokeStyle = C('--flash'); cx.lineWidth = 2; cx.setLineDash([4, 3]);
+      cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
+      cx.setLineDash([]);
+    }
+    drawShip(foe, C('--signal'));
+    drawShip(you, C('--brass'));
+    // muzzle
+    if (fx.muzzle) {
+      const m = fx.muzzle, age = now() - m.t0;
+      if (age < m.life) {
+        const ang = Math.atan2(m.ty - m.y, m.tx - m.x);
+        cx.save(); cx.translate(m.x, m.y); cx.rotate(ang);
+        cx.strokeStyle = C('--flash'); cx.lineWidth = 2;
+        for (const sp of [-0.25, 0, 0.25]) {
+          cx.save(); cx.rotate(sp);
+          cx.beginPath(); cx.moveTo(S * 0.5, 0); cx.lineTo(S * 0.95, 0); cx.stroke();
+          cx.restore();
+        }
+        cx.restore();
+      }
+    }
+    // tracer
+    if (fx.tracer) {
+      const t = fx.tracer;
+      const X = t.x1 + (t.x2 - t.x1) * t.k, Y = t.y1 + (t.y2 - t.y1) * t.k;
+      cx.strokeStyle = C('--flash'); cx.lineWidth = 2;
+      cx.beginPath();
+      cx.moveTo(t.x1 + (X - t.x1) * 0.7, t.y1 + (Y - t.y1) * 0.7);
+      cx.lineTo(X, Y); cx.stroke();
+      cx.fillStyle = C('--flash');
+      cx.beginPath(); cx.arc(X, Y, 2.5, 0, Math.PI * 2); cx.fill();
+    }
+    // flashes
+    const tNow = now();
+    fx.flashes = fx.flashes.filter(f => tNow - f.t0 < f.life);
+    for (const f of fx.flashes) {
+      const k = (tNow - f.t0) / f.life;
+      const R = (f.big ? S * 1.15 : S * 0.7) * (0.3 + 0.7 * k);
+      cx.globalAlpha = 1 - k;
+      cx.strokeStyle = f.color; cx.lineWidth = f.big ? 3 : 2;
+      cx.beginPath(); cx.arc(f.x, f.y, R, 0, Math.PI * 2); cx.stroke();
+      if (f.big) {
+        for (let i = 0; i < 6; i++) {
+          const a = Math.PI / 3 * i + k * 0.6;
+          cx.beginPath();
+          cx.moveTo(f.x + Math.cos(a) * R * 0.5, f.y + Math.sin(a) * R * 0.5);
+          cx.lineTo(f.x + Math.cos(a) * R * 1.25, f.y + Math.sin(a) * R * 1.25);
+          cx.stroke();
+        }
+      }
+      cx.globalAlpha = 1;
+    }
+    // floaters
+    fx.floaters = fx.floaters.filter(f => tNow - f.t0 < f.life);
+    cx.font = '700 12px "IBM Plex Mono", monospace';
+    cx.textAlign = 'center';
+    for (const f of fx.floaters) {
+      const k = (tNow - f.t0) / f.life;
+      cx.globalAlpha = k < 0.15 ? k / 0.15 : 1 - (k - 0.15) / 0.85;
+      cx.fillStyle = f.color;
+      cx.fillText(f.text, f.x, f.y - k * 26);
+      cx.globalAlpha = 1;
+    }
+    cx.restore(); // end pan
+    // wind rose — pinned to the screen, not the sea
+    const wx = 28, wy = 28;
+    cx.save();
+    cx.translate(wx, wy);
+    cx.strokeStyle = C('--ink-dim'); cx.lineWidth = 1;
+    cx.beginPath(); cx.arc(0, 0, 15, 0, Math.PI * 2); cx.stroke();
+    cx.rotate(angleOf(windFrom) + Math.PI);
+    cx.strokeStyle = C('--flash'); cx.lineWidth = 2;
+    cx.beginPath(); cx.moveTo(-9, 0); cx.lineTo(9, 0); cx.stroke();
+    cx.beginPath(); cx.moveTo(9, 0); cx.lineTo(4, -4); cx.moveTo(9, 0); cx.lineTo(4, 4); cx.stroke();
+    cx.restore();
+    cx.fillStyle = C('--ink-dim');
+    cx.font = '600 9px "Barlow Condensed", sans-serif';
+    cx.textAlign = 'center';
+    cx.fillText('WIND', wx, wy + 26);
+    cx.restore();
+  }
+  function shipPx(s) { return fx.shipPos[s.name] || px(s.q, s.r); }
+  function drawShip(s, color) {
+    const p = shipPx(s);
+    cx.save();
+    cx.translate(p.x, p.y);
+    cx.rotate(angleOf(s.facing));
+    const L = S * 0.72, W2 = S * 0.32;
+    cx.fillStyle = color;
+    cx.beginPath();
+    cx.moveTo(L, 0);
+    cx.lineTo(L * 0.25, -W2);
+    cx.lineTo(-L * 0.8, -W2 * 0.85);
+    cx.lineTo(-L * 0.8, W2 * 0.85);
+    cx.lineTo(L * 0.25, W2);
+    cx.closePath(); cx.fill();
+    cx.strokeStyle = C('--sea'); cx.lineWidth = 2;
+    const n = s.sails === 'full' ? 3 : (s.sails === 'battle' ? 2 : 1);
+    for (let i = 0; i < n; i++) {
+      cx.beginPath(); cx.moveTo(-L * 0.5 + i * L * 0.4, -W2 * 0.55); cx.lineTo(-L * 0.5 + i * L * 0.4, W2 * 0.55); cx.stroke();
+    }
+    if (s.isYou) {
+      // battery state: a bright strake on each loaded side (local +y = starboard)
+      cx.lineWidth = 2;
+      cx.strokeStyle = s.guns.stbd === 0 ? C('--flash') : C('--chart');
+      cx.beginPath(); cx.moveTo(-L * 0.55, W2 + 3.5); cx.lineTo(L * 0.15, W2 + 3.5); cx.stroke();
+      cx.strokeStyle = s.guns.port === 0 ? C('--flash') : C('--chart');
+      cx.beginPath(); cx.moveTo(-L * 0.55, -W2 - 3.5); cx.lineTo(L * 0.15, -W2 - 3.5); cx.stroke();
+    }
+    cx.restore();
+    if (s.inIrons && !over) {
+      cx.fillStyle = C('--flash');
+      cx.font = '700 10px "Barlow Condensed", sans-serif';
+      cx.textAlign = 'center';
+      cx.fillText('IN IRONS', p.x, p.y - S * 0.85);
+    }
+  }
+
+  // ---------- order UI ----------
+  function wireSeg(id, key) {
+    const seg = document.getElementById(id);
+    seg.addEventListener('pointerdown', ev => {
+      const b = ev.target.closest('button');
+      if (!b || b.disabled || busy) return;
+      for (const x of seg.querySelectorAll('button')) x.classList.remove('on');
+      b.classList.add('on');
+      orders[key] = key === 'helm' ? parseInt(b.dataset.v, 10) : b.dataset.v;
+      syncOrdersUI(); draw(); updateHint();
+    });
+  }
+  function syncSegs() {
+    for (const [id, key, val] of [['segHelm','helm',String(orders.helm)], ['segSails','sails',orders.sails], ['segShot','shot',orders.shot], ['segGrap','grapple',orders.grapple], ['segMelee','melee',orders.melee]]) {
+      const seg = document.getElementById(id);
+      for (const b of seg.querySelectorAll('button')) b.classList.toggle('on', b.dataset.v === val);
+    }
+  }
+  function syncOrdersUI() {
+    document.getElementById('ordersNormal').style.display = grappled ? 'none' : 'flex';
+    document.getElementById('ordersBoarding').style.display = grappled ? 'flex' : 'none';
+    const far = hexDist(you, foe) > 2;
+    document.getElementById('grapBtn').disabled = far;
+    if (far && orders.grapple === 'yes') { orders.grapple = 'no'; syncSegs(); }
+    for (const b of document.getElementById('segShot').querySelectorAll('button')) {
+      b.disabled = (b.dataset.v !== 'hold') && (!anyLoaded(you) || orders.sails === 'full');
+    }
+  }
+
+  wireSeg('segHelm', 'helm');
+  wireSeg('segSails', 'sails');
+  wireSeg('segShot', 'shot');
+  wireSeg('segGrap', 'grapple');
+  wireSeg('segMelee', 'melee');
+  document.getElementById('exec').addEventListener('pointerdown', execute);
+  document.getElementById('restart').addEventListener('pointerdown', () => { if (!busy) { sizeCanvas(); reset(); } });
+  document.getElementById('bBtn').addEventListener('pointerdown', () => { sizeCanvas(); reset(); });
+  window.addEventListener('resize', () => { sizeCanvas(); draw(); });
+
+  sizeCanvas();
+  makeShips(); turn = 1; windFrom = 0; over = false; grappled = false;
+  syncHud(); draw();
+})();
+</script>
